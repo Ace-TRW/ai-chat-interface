@@ -36,6 +36,7 @@ import {
   Send,
   ArrowLeft,
   StopCircle,
+  Menu,
 } from "lucide-react";
 import { styles } from "./styles";
 import Sidebar from "./components/Sidebar";
@@ -66,6 +67,12 @@ const AIChatInterface = () => {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showOutOfMessagesModal, setShowOutOfMessagesModal] = useState(false);
+
+  // Mobile responsiveness state
+  const [isMobile, setIsMobile] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+
   const [messageAllowance, setMessageAllowance] = useState({
     freeUsed: 0,
     freeTotal: 30,
@@ -101,6 +108,58 @@ const AIChatInterface = () => {
   const [showPurchaseModal, setShowPurchaseModal] = useState(null);
   const [selectedPurchaseMethod, setSelectedPurchaseMethod] =
     useState("wallet");
+
+  // Mobile detection and window resize handler
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+      // Close sidebar on desktop
+      if (window.innerWidth > 768) {
+        setSidebarOpen(false);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Close sidebar when clicking outside on mobile
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        isMobile &&
+        sidebarOpen &&
+        !event.target.closest(".sidebar") &&
+        !event.target.closest(".mobile-menu-button")
+      ) {
+        setSidebarOpen(false);
+      }
+    };
+
+    if (sidebarOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [isMobile, sidebarOpen]);
+
+  // Prevent body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (isMobile && sidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMobile, sidebarOpen]);
 
   // Simulate fetching platform card (in a real app, from API/context)
   useEffect(() => {
@@ -448,7 +507,47 @@ const AIChatInterface = () => {
   };
 
   return (
-    <div style={styles.container}>
+    <div
+      style={{
+        ...styles.container,
+        ...(isMobile ? styles.containerMobile : {}),
+      }}
+    >
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <div
+          style={{
+            position: "fixed",
+            top: "16px",
+            left: "16px",
+            zIndex: 1002,
+            ...styles.mobileMenuButton,
+            ...styles.mobileMenuButtonVisible,
+          }}
+        >
+          <button
+            onClick={() => setShowMobileSidebar(true)}
+            style={{
+              ...styles.mobileMenuButton,
+              ...styles.mobileMenuButtonVisible,
+            }}
+          >
+            <Menu size={20} />
+          </button>
+        </div>
+      )}
+
+      {/* Sidebar Overlay for Mobile */}
+      {isMobile && showMobileSidebar && (
+        <div
+          style={{
+            ...styles.sidebarOverlay,
+            ...styles.sidebarOverlayVisible,
+          }}
+          onClick={() => setShowMobileSidebar(false)}
+        />
+      )}
+
       <Sidebar
         styles={styles}
         searchQuery={searchQuery}
@@ -462,12 +561,42 @@ const AIChatInterface = () => {
         showSettings={showSettings}
         handleDeleteChat={handleDeleteChat}
         handleRenameChat={handleRenameChat}
+        isMobile={isMobile}
+        showMobileSidebar={showMobileSidebar}
+        setShowMobileSidebar={setShowMobileSidebar}
       />
 
       {/* Main Chat Area */}
-      <div style={styles.mainContent}>
-        <div style={styles.chatHeader}>
-          <div style={styles.chatHeaderInfo}>
+      <div
+        style={{
+          ...styles.mainContent,
+          ...(isMobile ? styles.mainContentMobile : {}),
+        }}
+      >
+        <div
+          style={{
+            ...styles.chatHeader,
+            ...(isMobile ? styles.chatHeaderMobile : {}),
+          }}
+        >
+          <div
+            style={{
+              ...styles.chatHeaderInfo,
+              ...(isMobile ? styles.chatHeaderInfoMobile : {}),
+            }}
+          >
+            {isMobile && (
+              <button
+                onClick={() => setShowMobileSidebar(true)}
+                style={{
+                  ...styles.mobileMenuButton,
+                  ...styles.mobileMenuButtonVisible,
+                  marginRight: "8px",
+                }}
+              >
+                <Menu size={20} />
+              </button>
+            )}
             <MessageSquare size={20} color="#f0b86c" />
             {editingTitle ? (
               <input
@@ -492,26 +621,47 @@ const AIChatInterface = () => {
               />
             ) : (
               <h2
-                style={{ margin: 0, fontSize: "18px", cursor: "pointer" }}
+                style={{
+                  margin: 0,
+                  fontSize: isMobile ? "16px" : "18px",
+                  cursor: "pointer",
+                  flex: 1,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
                 onClick={() => setEditingTitle(true)}
               >
                 {chats.find((c) => c.id === activeChat)?.title || "New Chat"}
               </h2>
             )}
-            <Edit2
-              size={14}
-              style={{ opacity: 0.5, cursor: "pointer" }}
-              onClick={() => setEditingTitle(true)}
-            />
+            {!isMobile && (
+              <Edit2
+                size={14}
+                style={{ opacity: 0.5, cursor: "pointer" }}
+                onClick={() => setEditingTitle(true)}
+              />
+            )}
           </div>
-          <div style={styles.modelSelector}>
+          <div
+            style={{
+              ...styles.modelSelector,
+              ...(isMobile ? styles.modelSelectorMobile : {}),
+            }}
+          >
             <Sparkles size={14} />
-            <span style={{ fontSize: "13px" }}>Model: GPT 4o</span>
+            <span style={{ fontSize: isMobile ? "14px" : "13px" }}>
+              Model: GPT 4o
+            </span>
           </div>
         </div>
 
         <div
-          style={{ ...styles.chatArea, position: "relative" }}
+          style={{
+            ...styles.chatArea,
+            ...(isMobile ? styles.chatAreaMobile : {}),
+            position: "relative",
+          }}
           onScroll={(e) => {
             const { scrollTop, scrollHeight, clientHeight } = e.target;
             setShowScrollButton(scrollHeight - scrollTop - clientHeight > 100);
@@ -526,26 +676,40 @@ const AIChatInterface = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 height: "100%",
-                gap: "24px",
+                gap: isMobile ? "16px" : "24px",
+                padding: isMobile ? "20px" : "0",
               }}
             >
-              <Bot size={48} color="#f0b86c" style={{ opacity: 0.5 }} />
-              <h3 style={{ color: "#a0aec0", fontWeight: "500" }}>
+              <Bot
+                size={isMobile ? 40 : 48}
+                color="#f0b86c"
+                style={{ opacity: 0.5 }}
+              />
+              <h3
+                style={{
+                  color: "#a0aec0",
+                  fontWeight: "500",
+                  fontSize: isMobile ? "18px" : "20px",
+                  textAlign: "center",
+                  margin: 0,
+                }}
+              >
                 Start a conversation
               </h3>
               <div
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
-                  gap: "12px",
+                  gap: isMobile ? "8px" : "12px",
                   justifyContent: "center",
-                  maxWidth: "600px",
+                  maxWidth: isMobile ? "100%" : "600px",
                 }}
               >
                 <button
                   style={{
                     ...styles.actionButton,
-                    padding: "10px 16px",
+                    ...(isMobile ? styles.actionButtonMobile : {}),
+                    padding: isMobile ? "12px 16px" : "10px 16px",
                     backgroundColor: "#101a22",
                   }}
                   onClick={() =>
@@ -566,12 +730,13 @@ const AIChatInterface = () => {
                   }}
                 >
                   <Sparkles size={16} color="#f0b86c" />
-                  Create A Weekly Template
+                  {isMobile ? "Weekly Template" : "Create A Weekly Template"}
                 </button>
                 <button
                   style={{
                     ...styles.actionButton,
-                    padding: "10px 16px",
+                    ...(isMobile ? styles.actionButtonMobile : {}),
+                    padding: isMobile ? "12px 16px" : "10px 16px",
                     backgroundColor: "#101a22",
                   }}
                   onClick={() =>
@@ -592,12 +757,15 @@ const AIChatInterface = () => {
                   }}
                 >
                   <Clock size={16} />
-                  Help Me Organize My Daily Tasks
+                  {isMobile
+                    ? "Organize Tasks"
+                    : "Help Me Organize My Daily Tasks"}
                 </button>
                 <button
                   style={{
                     ...styles.actionButton,
-                    padding: "10px 16px",
+                    ...(isMobile ? styles.actionButtonMobile : {}),
+                    padding: isMobile ? "12px 16px" : "10px 16px",
                     backgroundColor: "#101a22",
                   }}
                   onClick={() =>
@@ -618,35 +786,78 @@ const AIChatInterface = () => {
                   }}
                 >
                   <CheckSquare size={16} />
-                  Generate Project Checklist
+                  {isMobile
+                    ? "Project Checklist"
+                    : "Generate Project Checklist"}
                 </button>
               </div>
             </div>
           )}
 
           {messages.map((message) => (
-            <div key={message.id} style={styles.messageGroup}>
+            <div
+              key={message.id}
+              style={{
+                ...styles.messageGroup,
+                ...(isMobile ? styles.messageGroupMobile : {}),
+              }}
+            >
               <div
-                style={styles.message}
+                style={{
+                  ...styles.message,
+                  ...(isMobile ? styles.messageMobile : {}),
+                }}
                 data-message-id={message.id}
                 onMouseEnter={() => setHoveredMessage(message.id)}
                 onMouseLeave={() => setHoveredMessage(null)}
               >
-                <div style={styles.messageAvatar}>
+                <div
+                  style={{
+                    ...styles.messageAvatar,
+                    ...(isMobile ? styles.messageAvatarMobile : {}),
+                  }}
+                >
                   {message.role === "user" ? (
-                    <User size={18} />
+                    <User size={isMobile ? 16 : 18} />
                   ) : (
-                    <Bot size={18} color="#f0b86c" />
+                    <Bot size={isMobile ? 16 : 18} color="#f0b86c" />
                   )}
                 </div>
-                <div style={styles.messageContent}>
-                  <div style={styles.messageHeader}>
-                    <span style={styles.messageName}>
+                <div
+                  style={{
+                    ...styles.messageContent,
+                    ...(isMobile ? styles.messageContentMobile : {}),
+                  }}
+                >
+                  <div
+                    style={{
+                      ...styles.messageHeader,
+                      ...(isMobile ? styles.messageHeaderMobile : {}),
+                    }}
+                  >
+                    <span
+                      style={{
+                        ...styles.messageName,
+                        ...(isMobile ? styles.messageNameMobile : {}),
+                      }}
+                    >
                       {message.role === "user" ? "You" : "AI Assistant"}
                     </span>
-                    <span style={styles.messageTime}>{message.timestamp}</span>
+                    <span
+                      style={{
+                        ...styles.messageTime,
+                        ...(isMobile ? styles.messageTimeMobile : {}),
+                      }}
+                    >
+                      {message.timestamp}
+                    </span>
                   </div>
-                  <div style={styles.messageText}>
+                  <div
+                    style={{
+                      ...styles.messageText,
+                      ...(isMobile ? styles.messageTextMobile : {}),
+                    }}
+                  >
                     {editingMessage === message.id ? (
                       <div>
                         <textarea
@@ -694,19 +905,28 @@ const AIChatInterface = () => {
                       message.content
                     )}
                   </div>
-                  {/* Reserved space for message actions - always present but only visible on hover */}
+                  {/* Reserved space for message actions - always present but only visible on hover/mobile */}
                   <div
                     style={{
-                      height: "32px",
+                      height: isMobile ? "auto" : "32px",
                       display: "flex",
                       alignItems: "center",
-                      opacity: hoveredMessage === message.id ? 1 : 0,
+                      opacity:
+                        hoveredMessage === message.id || isMobile ? 1 : 0,
                       transition: "opacity 0.2s ease",
                     }}
                   >
-                    <div style={styles.messageActions}>
+                    <div
+                      style={{
+                        ...styles.messageActions,
+                        ...(isMobile ? styles.messageActionsMobile : {}),
+                      }}
+                    >
                       <button
-                        style={styles.actionButton}
+                        style={{
+                          ...styles.actionButton,
+                          ...(isMobile ? styles.actionButtonMobile : {}),
+                        }}
                         onClick={() => {
                           navigator.clipboard.writeText(message.content);
                         }}
@@ -728,7 +948,10 @@ const AIChatInterface = () => {
                       {message.role === "user" ? (
                         <>
                           <button
-                            style={styles.actionButton}
+                            style={{
+                              ...styles.actionButton,
+                              ...(isMobile ? styles.actionButtonMobile : {}),
+                            }}
                             onClick={() =>
                               setEditingMessage(
                                 editingMessage === message.id
@@ -753,7 +976,10 @@ const AIChatInterface = () => {
                             Edit
                           </button>
                           <button
-                            style={styles.actionButton}
+                            style={{
+                              ...styles.actionButton,
+                              ...(isMobile ? styles.actionButtonMobile : {}),
+                            }}
                             onClick={() => {
                               setMessages(
                                 messages.filter((m) => m.id !== message.id)
@@ -779,7 +1005,10 @@ const AIChatInterface = () => {
                       ) : (
                         <>
                           <button
-                            style={styles.actionButton}
+                            style={{
+                              ...styles.actionButton,
+                              ...(isMobile ? styles.actionButtonMobile : {}),
+                            }}
                             onClick={() => {
                               setIsTyping(true);
                               setIsGenerating(true);
@@ -931,12 +1160,22 @@ const AIChatInterface = () => {
           )}
         </div>
 
-        <div style={styles.inputContainer}>
+        <div
+          style={{
+            ...styles.inputContainer,
+            ...(isMobile ? styles.inputContainerMobile : {}),
+          }}
+        >
           {(() => {
             return (
               <>
                 {totalMessagesAvailable <= 10 && totalMessagesAvailable > 0 && (
-                  <div style={styles.tokenWarning}>
+                  <div
+                    style={{
+                      ...styles.tokenWarning,
+                      ...(isMobile ? styles.tokenWarningMobile : {}),
+                    }}
+                  >
                     <AlertCircle size={16} />
                     <span>
                       You have {totalMessagesAvailable} messages remaining.{" "}
@@ -959,7 +1198,12 @@ const AIChatInterface = () => {
                 )}
 
                 {totalMessagesAvailable === 0 && (
-                  <div style={styles.tokenWarning}>
+                  <div
+                    style={{
+                      ...styles.tokenWarning,
+                      ...(isMobile ? styles.tokenWarningMobile : {}),
+                    }}
+                  >
                     <AlertCircle size={16} />
                     <span>
                       You're out of messages. Free messages reset in{" "}
@@ -984,7 +1228,12 @@ const AIChatInterface = () => {
                   </div>
                 )}
 
-                <div style={styles.inputWrapper}>
+                <div
+                  style={{
+                    ...styles.inputWrapper,
+                    ...(isMobile ? styles.inputWrapperMobile : {}),
+                  }}
+                >
                   <textarea
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
@@ -995,53 +1244,72 @@ const AIChatInterface = () => {
                       }
                     }}
                     placeholder="Type your message..."
-                    style={styles.textInput}
+                    style={{
+                      ...styles.textInput,
+                      ...(isMobile ? styles.textInputMobile : {}),
+                    }}
                     rows={1}
                   />
                   <div
                     style={{
                       display: "flex",
-                      gap: "8px",
+                      gap: isMobile ? "6px" : "8px",
                       alignItems: "center",
                     }}
                   >
-                    <button
-                      style={{
-                        ...styles.actionButton,
-                        border: "none",
-                        padding: "8px",
-                        backgroundColor: "transparent",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.backgroundColor =
-                          "rgba(255, 255, 255, 0.1)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.backgroundColor = "transparent")
-                      }
-                    >
-                      <Paperclip size={18} />
-                    </button>
-                    <button
-                      style={{
-                        ...styles.actionButton,
-                        border: "none",
-                        padding: "8px",
-                        backgroundColor: "transparent",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.backgroundColor =
-                          "rgba(255, 255, 255, 0.1)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.backgroundColor = "transparent")
-                      }
-                    >
-                      <Mic size={18} />
-                    </button>
+                    {!isMobile && (
+                      <>
+                        <button
+                          style={{
+                            ...styles.actionButton,
+                            border: "none",
+                            padding: "8px",
+                            backgroundColor: "transparent",
+                          }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.backgroundColor =
+                              "rgba(255, 255, 255, 0.1)")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.backgroundColor =
+                              "transparent")
+                          }
+                        >
+                          <Paperclip size={18} />
+                        </button>
+                        <button
+                          style={{
+                            ...styles.actionButton,
+                            border: "none",
+                            padding: "8px",
+                            backgroundColor: "transparent",
+                          }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.backgroundColor =
+                              "rgba(255, 255, 255, 0.1)")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.backgroundColor =
+                              "transparent")
+                          }
+                        >
+                          <Mic size={18} />
+                        </button>
+                      </>
+                    )}
                     {isGenerating ? (
                       <button
-                        style={styles.stopButton}
+                        style={{
+                          ...styles.stopButton,
+                          ...(isMobile
+                            ? {
+                                padding: "12px 16px",
+                                fontSize: "16px",
+                                minWidth: "48px",
+                                minHeight: "48px",
+                              }
+                            : {}),
+                        }}
                         onClick={handleStopGeneration}
                         onMouseEnter={(e) =>
                           (e.currentTarget.style.backgroundColor = "#dc2626")
@@ -1051,12 +1319,13 @@ const AIChatInterface = () => {
                         }
                       >
                         <Square size={14} />
-                        Stop
+                        {!isMobile && "Stop"}
                       </button>
                     ) : (
                       <button
                         style={{
                           ...styles.sendButton,
+                          ...(isMobile ? styles.sendButtonMobile : {}),
                           opacity:
                             messageInput.trim() && totalMessagesAvailable > 0
                               ? 1
@@ -1082,7 +1351,7 @@ const AIChatInterface = () => {
                           e.currentTarget.style.backgroundColor = "#f0b86c";
                         }}
                       >
-                        Send
+                        {isMobile ? "Send" : "Send"}
                       </button>
                     )}
                   </div>

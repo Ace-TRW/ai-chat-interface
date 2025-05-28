@@ -6,6 +6,10 @@ export const styles = {
     fontFamily:
       '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
     color: "#ffffff",
+    position: "relative",
+  },
+  containerMobile: {
+    flexDirection: "column",
   },
   sidebar: {
     width: "280px",
@@ -14,17 +18,50 @@ export const styles = {
     display: "flex",
     flexDirection: "column",
   },
+  sidebarMobile: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    height: "100vh",
+    width: "100vw",
+    zIndex: 1000,
+    transform: "translateX(-100%)",
+    transition: "transform 0.3s ease",
+    borderRight: "none",
+  },
+  sidebarMobileOpen: {
+    transform: "translateX(0)",
+  },
+  sidebarOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    zIndex: 999,
+    display: "none",
+  },
+  sidebarOverlayVisible: {
+    display: "block",
+  },
   sidebarHeader: {
     padding: "20px 16px 16px",
     borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
     background:
       "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%)",
   },
+  sidebarHeaderMobile: {
+    padding: "16px 12px 12px",
+  },
   logoSection: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: "16px",
+  },
+  logoSectionMobile: {
+    marginBottom: "12px",
   },
   logo: {
     fontSize: "20px",
@@ -37,6 +74,9 @@ export const styles = {
     WebkitTextFillColor: "transparent",
     backgroundClip: "text",
   },
+  logoMobile: {
+    fontSize: "18px",
+  },
   settingsButton: {
     padding: "6px",
     backgroundColor: "transparent",
@@ -48,6 +88,47 @@ export const styles = {
     alignItems: "center",
     justifyContent: "center",
     transition: "all 0.2s",
+  },
+  settingsButtonMobile: {
+    padding: "8px",
+    minWidth: "44px",
+    minHeight: "44px",
+  },
+  mobileMenuButton: {
+    display: "none",
+    padding: "8px",
+    backgroundColor: "transparent",
+    border: "none",
+    color: "#ffffff",
+    cursor: "pointer",
+    borderRadius: "6px",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: "44px",
+    minHeight: "44px",
+  },
+  mobileMenuButtonVisible: {
+    display: "flex",
+  },
+  mobileCloseButton: {
+    display: "none",
+    position: "absolute",
+    top: "16px",
+    right: "16px",
+    padding: "8px",
+    backgroundColor: "transparent",
+    border: "none",
+    color: "#ffffff",
+    cursor: "pointer",
+    borderRadius: "6px",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: "44px",
+    minHeight: "44px",
+    zIndex: 1001,
+  },
+  mobileCloseButtonVisible: {
+    display: "flex",
   },
   tokenBar: {
     height: "4px",
@@ -80,11 +161,19 @@ export const styles = {
     transition: "all 0.2s",
     boxShadow: "0 4px 12px rgba(245, 158, 11, 0.3)",
   },
+  newChatButtonMobile: {
+    padding: "14px",
+    fontSize: "16px",
+    minHeight: "48px",
+  },
   searchContainer: {
     padding: "12px 16px",
     position: "relative",
     width: "100%",
     boxSizing: "border-box",
+  },
+  searchContainerMobile: {
+    padding: "8px 12px",
   },
   searchInput: {
     width: "calc(100% - 0px)",
@@ -97,6 +186,11 @@ export const styles = {
     outline: "none",
     boxSizing: "border-box",
   },
+  searchInputMobile: {
+    padding: "12px 12px 12px 40px",
+    fontSize: "16px", // Prevent zoom on iOS
+    minHeight: "44px",
+  },
   searchIcon: {
     position: "absolute",
     left: "28px",
@@ -105,10 +199,16 @@ export const styles = {
     color: "#6b7280",
     pointerEvents: "none",
   },
+  searchIconMobile: {
+    left: "24px",
+  },
   chatList: {
     flex: 1,
     overflowY: "auto",
     padding: "8px",
+  },
+  chatListMobile: {
+    padding: "4px",
   },
   chatItem: {
     padding: "10px 12px",
@@ -120,6 +220,11 @@ export const styles = {
     alignItems: "center",
     justifyContent: "space-between",
     transition: "all 0.2s",
+  },
+  chatItemMobile: {
+    padding: "14px 12px",
+    marginBottom: "6px",
+    minHeight: "48px",
   },
   chatItemActive: {
     background:
@@ -139,12 +244,18 @@ export const styles = {
     whiteSpace: "nowrap",
     flex: 1,
   },
+  chatTitleMobile: {
+    fontSize: "16px",
+  },
   chatPreview: {
     fontSize: "12px",
     color: "#6b7280",
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
+  },
+  chatPreviewMobile: {
+    fontSize: "14px",
   },
   chatMenu: {
     position: "absolute",
@@ -163,6 +274,12 @@ export const styles = {
     opacity: 0,
     transition: "opacity 0.2s",
   },
+  menuButtonMobile: {
+    opacity: 1,
+    padding: "8px",
+    minWidth: "36px",
+    minHeight: "36px",
+  },
   menuDropdown: {
     position: "absolute",
     right: "0",
@@ -175,6 +292,10 @@ export const styles = {
     minWidth: "120px",
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
   },
+  menuDropdownMobile: {
+    minWidth: "140px",
+    padding: "6px",
+  },
   menuItem: {
     padding: "8px 12px",
     fontSize: "13px",
@@ -186,11 +307,20 @@ export const styles = {
     gap: "8px",
     transition: "background-color 0.2s",
   },
+  menuItemMobile: {
+    padding: "12px 16px",
+    fontSize: "16px",
+    minHeight: "44px",
+  },
   mainContent: {
     flex: 1,
     display: "flex",
     flexDirection: "column",
     backgroundColor: "#0f1419",
+  },
+  mainContentMobile: {
+    width: "100%",
+    height: "100vh",
   },
   chatHeader: {
     padding: "16px 20px",
@@ -202,10 +332,18 @@ export const styles = {
       "linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.6) 100%)",
     backdropFilter: "blur(10px)",
   },
+  chatHeaderMobile: {
+    padding: "12px 16px",
+    minHeight: "60px",
+  },
   chatHeaderInfo: {
     display: "flex",
     alignItems: "center",
     gap: "12px",
+  },
+  chatHeaderInfoMobile: {
+    gap: "8px",
+    flex: 1,
   },
   modelSelector: {
     padding: "6px 12px",
@@ -219,18 +357,34 @@ export const styles = {
     alignItems: "center",
     gap: "6px",
   },
+  modelSelectorMobile: {
+    padding: "8px 12px",
+    fontSize: "14px",
+    minHeight: "40px",
+  },
   chatArea: {
     flex: 1,
     overflowY: "auto",
     padding: "20px",
   },
+  chatAreaMobile: {
+    padding: "12px",
+    paddingBottom: "20px",
+  },
   messageGroup: {
     marginBottom: "24px",
+  },
+  messageGroupMobile: {
+    marginBottom: "16px",
   },
   message: {
     display: "flex",
     gap: "12px",
     marginBottom: "16px",
+  },
+  messageMobile: {
+    gap: "8px",
+    marginBottom: "12px",
   },
   messageAvatar: {
     width: "32px",
@@ -242,8 +396,15 @@ export const styles = {
     justifyContent: "center",
     flexShrink: 0,
   },
+  messageAvatarMobile: {
+    width: "28px",
+    height: "28px",
+  },
   messageContent: {
     flex: 1,
+  },
+  messageContentMobile: {
+    minWidth: 0, // Allow text to wrap properly
   },
   messageHeader: {
     display: "flex",
@@ -251,24 +412,44 @@ export const styles = {
     gap: "8px",
     marginBottom: "4px",
   },
+  messageHeaderMobile: {
+    gap: "6px",
+    flexWrap: "wrap",
+  },
   messageName: {
     fontSize: "14px",
     fontWeight: "600",
   },
+  messageNameMobile: {
+    fontSize: "15px",
+  },
   messageTime: {
     fontSize: "12px",
     color: "#6b7280",
+  },
+  messageTimeMobile: {
+    fontSize: "13px",
   },
   messageText: {
     fontSize: "14px",
     lineHeight: "1.6",
     color: "#e5e7eb",
   },
+  messageTextMobile: {
+    fontSize: "15px",
+    lineHeight: "1.5",
+    wordBreak: "break-word", // Prevent long words from overflowing
+  },
   messageActions: {
     display: "flex",
     gap: "4px",
     marginTop: "8px",
     transition: "opacity 0.2s ease",
+  },
+  messageActionsMobile: {
+    gap: "6px",
+    marginTop: "12px",
+    flexWrap: "wrap",
   },
   actionButton: {
     padding: "4px 8px",
@@ -283,6 +464,11 @@ export const styles = {
     gap: "4px",
     transition: "all 0.2s",
   },
+  actionButtonMobile: {
+    padding: "8px 12px",
+    fontSize: "14px",
+    minHeight: "36px",
+  },
   typingIndicator: {
     display: "flex",
     alignItems: "center",
@@ -291,6 +477,9 @@ export const styles = {
     backgroundColor: "#151b26",
     borderRadius: "16px",
     width: "fit-content",
+  },
+  typingIndicatorMobile: {
+    padding: "10px 14px",
   },
   typingDot: {
     width: "8px",
@@ -303,6 +492,10 @@ export const styles = {
     padding: "16px 20px",
     borderTop: "1px solid rgba(255, 255, 255, 0.1)",
   },
+  inputContainerMobile: {
+    padding: "12px 16px",
+    paddingBottom: "max(12px, env(safe-area-inset-bottom))", // Handle iPhone notch
+  },
   inputWrapper: {
     display: "flex",
     alignItems: "flex-end",
@@ -311,6 +504,11 @@ export const styles = {
     borderRadius: "12px",
     padding: "12px",
     border: "1px solid rgba(255, 255, 255, 0.1)",
+  },
+  inputWrapperMobile: {
+    gap: "8px",
+    padding: "10px",
+    borderRadius: "16px",
   },
   textInput: {
     flex: 1,
@@ -322,6 +520,11 @@ export const styles = {
     resize: "none",
     minHeight: "20px",
     maxHeight: "120px",
+  },
+  textInputMobile: {
+    fontSize: "16px", // Prevent zoom on iOS
+    minHeight: "24px",
+    maxHeight: "100px",
   },
   sendButton: {
     padding: "10px 16px",
@@ -338,6 +541,13 @@ export const styles = {
     transition: "all 0.2s",
     boxShadow: "0 4px 12px rgba(245, 158, 11, 0.3)",
   },
+  sendButtonMobile: {
+    padding: "12px 16px",
+    fontSize: "16px",
+    minWidth: "48px",
+    minHeight: "48px",
+    borderRadius: "12px",
+  },
   tokenWarning: {
     padding: "8px 12px",
     backgroundColor: "rgba(239, 68, 68, 0.1)",
@@ -350,6 +560,12 @@ export const styles = {
     alignItems: "center",
     gap: "8px",
   },
+  tokenWarningMobile: {
+    padding: "10px 14px",
+    fontSize: "14px",
+    marginBottom: "10px",
+    borderRadius: "8px",
+  },
   scrollToBottomButton: {
     position: "absolute",
     bottom: "20px",
@@ -357,68 +573,95 @@ export const styles = {
     width: "40px",
     height: "40px",
     borderRadius: "50%",
-    backgroundColor: "#151b26",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
+    backgroundColor: "#101a22",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
     color: "#ffffff",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
     transition: "all 0.2s",
+    zIndex: 10,
+  },
+  scrollToBottomButtonMobile: {
+    bottom: "100px", // Above mobile input area
+    right: "16px",
+    width: "48px",
+    height: "48px",
   },
   stopButton: {
+    padding: "8px 12px",
+    backgroundColor: "#ef4444",
+    border: "none",
+    borderRadius: "6px",
+    color: "#ffffff",
+    fontSize: "12px",
+    fontWeight: "600",
+    cursor: "pointer",
     display: "flex",
     alignItems: "center",
-    gap: "8px",
-    padding: "12px 16px",
-    backgroundColor: "#ef4444",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontSize: "14px",
-    fontWeight: "500",
-    width: "100%",
-    justifyContent: "center",
+    gap: "4px",
+    transition: "all 0.2s",
   },
   modalOverlay: {
     position: "fixed",
     top: 0,
     left: 0,
-    right: 0,
-    bottom: 0,
+    width: "100vw",
+    height: "100vh",
     backgroundColor: "rgba(0, 0, 0, 0.7)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 1000,
+    zIndex: 2000,
+    padding: "20px",
+    boxSizing: "border-box",
+  },
+  modalOverlayMobile: {
+    padding: "16px",
   },
   modal: {
-    backgroundColor: "#0f1419",
+    backgroundColor: "#151b26",
     borderRadius: "12px",
     padding: "24px",
-    maxWidth: "420px",
-    width: "90%",
+    maxWidth: "400px",
+    width: "100%",
     border: "1px solid rgba(255, 255, 255, 0.1)",
-    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5)",
+    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.5)",
+  },
+  modalMobile: {
+    padding: "20px",
+    borderRadius: "16px",
+    maxWidth: "100%",
   },
   modalTitle: {
-    fontSize: "20px",
+    fontSize: "18px",
     fontWeight: "600",
     marginBottom: "12px",
     color: "#ffffff",
   },
+  modalTitleMobile: {
+    fontSize: "16px",
+    marginBottom: "10px",
+  },
   modalBody: {
     fontSize: "14px",
     color: "#a0aec0",
+    lineHeight: "1.5",
     marginBottom: "20px",
-    lineHeight: "1.6",
+  },
+  modalBodyMobile: {
+    fontSize: "15px",
+    marginBottom: "18px",
   },
   modalButtons: {
     display: "flex",
     gap: "12px",
     justifyContent: "flex-end",
+  },
+  modalButtonsMobile: {
+    flexDirection: "column-reverse",
+    gap: "10px",
   },
   modalButton: {
     padding: "8px 16px",
@@ -429,15 +672,48 @@ export const styles = {
     transition: "all 0.2s",
     border: "none",
   },
+  modalButtonMobile: {
+    padding: "12px 16px",
+    fontSize: "16px",
+    minHeight: "48px",
+    borderRadius: "8px",
+  },
   modalPrimaryButton: {
     background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
     color: "#0f172a",
     boxShadow: "0 4px 12px rgba(245, 158, 11, 0.3)",
   },
   modalSecondaryButton: {
-    backgroundColor: "#151b26",
-    color: "#ffffff",
+    backgroundColor: "transparent",
+    color: "#a0aec0",
     border: "1px solid rgba(255, 255, 255, 0.2)",
+  },
+  titleInput: {
+    backgroundColor: "#151b26",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    borderRadius: "6px",
+    color: "#ffffff",
+    fontSize: "16px",
+    padding: "8px 12px",
+    outline: "none",
+    width: "200px",
+  },
+  titleInputMobile: {
+    fontSize: "16px",
+    padding: "10px 12px",
+    width: "100%",
+    maxWidth: "200px",
+  },
+  emptyStateSidebar: {
+    textAlign: "center",
+    color: "#6b7280",
+    fontSize: "14px",
+    padding: "20px",
+    lineHeight: "1.5",
+  },
+  emptyStateSidebarMobile: {
+    fontSize: "15px",
+    padding: "24px 16px",
   },
   settingsPanel: {
     position: "fixed",
@@ -445,86 +721,108 @@ export const styles = {
     right: 0,
     width: "400px",
     height: "100vh",
-    background: "linear-gradient(180deg, #0a0f14 0%, #0f1419 100%)",
+    backgroundColor: "#0a0f14",
     borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
+    zIndex: 1000,
     overflowY: "auto",
+    transform: "translateX(100%)",
     transition: "transform 0.3s ease",
-    zIndex: 999,
-    boxShadow: "-4px 0 20px rgba(0, 0, 0, 0.3)",
+  },
+  settingsPanelMobile: {
+    width: "100vw",
+    borderLeft: "none",
+  },
+  settingsPanelOpen: {
+    transform: "translateX(0)",
   },
   settingsHeader: {
     padding: "20px",
     borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+    background:
+      "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%)",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    background:
-      "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%)",
+  },
+  settingsHeaderMobile: {
+    padding: "16px",
   },
   settingsTitle: {
-    fontSize: "20px",
+    fontSize: "18px",
     fontWeight: "600",
-    color: "#ffffff",
-  },
-  settingsSection: {
-    padding: "20px",
-    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-  },
-  sectionTitle: {
-    fontSize: "16px",
-    fontWeight: "600",
-    marginBottom: "16px",
-    color: "#ffffff",
-  },
-  settingsItem: {
-    marginBottom: "16px",
-  },
-  settingsLabel: {
-    fontSize: "13px",
-    color: "#a0aec0",
-    marginBottom: "6px",
-  },
-  settingsValue: {
-    fontSize: "14px",
-    color: "#ffffff",
-  },
-  usageBar: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    marginBottom: "8px",
-  },
-  resetTimer: {
-    fontSize: "12px",
-    color: "#6b7280",
-  },
-  walletCard: {
-    backgroundColor: "#151b26",
-    borderRadius: "8px",
-    padding: "16px",
-    marginBottom: "16px",
-  },
-  walletBalance: {
-    fontSize: "24px",
-    fontWeight: "700",
+    margin: 0,
     background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     backgroundClip: "text",
+  },
+  settingsTitleMobile: {
+    fontSize: "16px",
+  },
+  closeButton: {
+    padding: "6px",
+    backgroundColor: "transparent",
+    border: "none",
+    color: "#a0aec0",
+    cursor: "pointer",
+    borderRadius: "6px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    transition: "all 0.2s",
+  },
+  closeButtonMobile: {
+    padding: "8px",
+    minWidth: "44px",
+    minHeight: "44px",
+  },
+  settingsContent: {
+    padding: "20px",
+  },
+  settingsContentMobile: {
+    padding: "16px",
+  },
+  settingsSection: {
+    marginBottom: "24px",
+  },
+  settingsSectionMobile: {
+    marginBottom: "20px",
+  },
+  sectionTitle: {
+    fontSize: "16px",
+    fontWeight: "600",
+    marginBottom: "12px",
+    color: "#ffffff",
+  },
+  sectionTitleMobile: {
+    fontSize: "15px",
+    marginBottom: "10px",
+  },
+  settingsItem: {
+    marginBottom: "16px",
+  },
+  settingsItemMobile: {
+    marginBottom: "14px",
+  },
+  settingsLabel: {
+    fontSize: "14px",
+    color: "#a0aec0",
+    marginBottom: "6px",
+  },
+  settingsLabelMobile: {
+    fontSize: "15px",
     marginBottom: "8px",
   },
-  topUpButton: {
-    width: "100%",
-    padding: "12px",
-    background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
-    color: "#0f172a",
-    border: "none",
-    borderRadius: "6px",
+  settingsValue: {
     fontSize: "14px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.2s",
-    boxShadow: "0 4px 12px rgba(245, 158, 11, 0.3)",
+    color: "#ffffff",
+    fontWeight: "500",
+  },
+  settingsValueMobile: {
+    fontSize: "15px",
+  },
+  usageBar: {
+    marginBottom: "8px",
   },
   cardItem: {
     display: "flex",
@@ -533,74 +831,42 @@ export const styles = {
     padding: "12px",
     backgroundColor: "#151b26",
     borderRadius: "8px",
-    marginBottom: "8px",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
   },
-  cardInfo: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
+  cardItemMobile: {
+    padding: "14px",
+    borderRadius: "10px",
   },
-  toggleSwitch: {
-    width: "44px",
-    height: "24px",
-    backgroundColor: "#1a1f2a",
-    borderRadius: "12px",
-    position: "relative",
-    cursor: "pointer",
-    transition: "background-color 0.3s",
-  },
-  toggleSlider: {
-    position: "absolute",
-    top: "2px",
-    left: "2px",
-    width: "20px",
-    height: "20px",
-    backgroundColor: "#ffffff",
-    borderRadius: "50%",
-    transition: "transform 0.3s",
-  },
-  toggleActive: {
+  buyButton: {
+    padding: "6px 12px",
     background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+    border: "none",
+    borderRadius: "6px",
+    color: "#0f172a",
+    fontSize: "12px",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "all 0.2s",
+    boxShadow: "0 2px 6px rgba(245, 158, 11, 0.3)",
+  },
+  buyButtonMobile: {
+    padding: "10px 16px",
+    fontSize: "14px",
+    minWidth: "60px",
+    minHeight: "40px",
+    borderRadius: "8px",
   },
   transactionItem: {
     display: "flex",
+    alignItems: "center",
     justifyContent: "space-between",
     padding: "8px 0",
     borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
   },
-  titleInput: {
-    backgroundColor: "transparent",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "6px",
-    padding: "4px 8px",
-    color: "#ffffff",
-    fontSize: "18px",
-    fontWeight: "600",
-    outline: "none",
-  },
-  emptyStateSidebar: {
-    display: "flex",
+  transactionItemMobile: {
+    padding: "12px 0",
     flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "60px 20px",
-    height: "200px",
-    textAlign: "center",
-    color: "#6b7280",
-    fontSize: "14px",
-    lineHeight: "1.5",
-  },
-  buyButton: {
-    padding: "8px 16px",
-    background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
-    color: "#0f172a",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.2s",
-    width: "auto",
-    boxShadow: "0 2px 8px rgba(245, 158, 11, 0.3)",
+    alignItems: "flex-start",
+    gap: "4px",
   },
 };

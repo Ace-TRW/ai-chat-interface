@@ -9,6 +9,7 @@ import {
   Trash2,
   Bot,
   MessageSquare,
+  X,
 } from "lucide-react";
 
 const Sidebar = ({
@@ -24,17 +25,57 @@ const Sidebar = ({
   showSettings,
   handleDeleteChat,
   handleRenameChat,
+  isMobile = false,
+  showMobileSidebar = false,
+  setShowMobileSidebar,
 }) => {
   return (
-    <div style={styles.sidebar}>
-      <div style={styles.sidebarHeader}>
-        <div style={styles.logoSection}>
-          <div style={styles.logo}>
-            <Bot size={24} color="#f0b86c" />
+    <div
+      style={{
+        ...styles.sidebar,
+        ...(isMobile ? styles.sidebarMobile : {}),
+        ...(isMobile && showMobileSidebar ? styles.sidebarMobileOpen : {}),
+      }}
+    >
+      {/* Mobile Close Button */}
+      {isMobile && (
+        <button
+          onClick={() => setShowMobileSidebar(false)}
+          style={{
+            ...styles.mobileCloseButton,
+            ...styles.mobileCloseButtonVisible,
+          }}
+        >
+          <X size={20} />
+        </button>
+      )}
+
+      <div
+        style={{
+          ...styles.sidebarHeader,
+          ...(isMobile ? styles.sidebarHeaderMobile : {}),
+        }}
+      >
+        <div
+          style={{
+            ...styles.logoSection,
+            ...(isMobile ? styles.logoSectionMobile : {}),
+          }}
+        >
+          <div
+            style={{
+              ...styles.logo,
+              ...(isMobile ? styles.logoMobile : {}),
+            }}
+          >
+            <Bot size={isMobile ? 22 : 24} color="#f0b86c" />
             <span>AI Assistant</span>
           </div>
           <button
-            style={styles.settingsButton}
+            style={{
+              ...styles.settingsButton,
+              ...(isMobile ? styles.settingsButtonMobile : {}),
+            }}
             onClick={() => setShowSettings(!showSettings)}
             onMouseEnter={(e) =>
               (e.currentTarget.style.backgroundColor = "#101a22")
@@ -48,25 +89,48 @@ const Sidebar = ({
         </div>
 
         <button
-          style={styles.newChatButton}
+          style={{
+            ...styles.newChatButton,
+            ...(isMobile ? styles.newChatButtonMobile : {}),
+          }}
           onMouseEnter={(e) =>
             (e.currentTarget.style.transform = "scale(1.02)")
           }
           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          onClick={() => {
+            // Close mobile sidebar when creating new chat
+            if (isMobile && setShowMobileSidebar) {
+              setShowMobileSidebar(false);
+            }
+          }}
         >
           <Plus size={16} />
           New Chat
         </button>
       </div>
 
-      <div style={styles.searchContainer}>
-        <Search size={16} style={styles.searchIcon} />
+      <div
+        style={{
+          ...styles.searchContainer,
+          ...(isMobile ? styles.searchContainerMobile : {}),
+        }}
+      >
+        <Search
+          size={16}
+          style={{
+            ...styles.searchIcon,
+            ...(isMobile ? styles.searchIconMobile : {}),
+          }}
+        />
         <input
           type="text"
           placeholder="Search chats..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={styles.searchInput}
+          style={{
+            ...styles.searchInput,
+            ...(isMobile ? styles.searchInputMobile : {}),
+          }}
           onFocus={(e) =>
             (e.target.style.borderColor = "rgba(240, 184, 108, 0.5)")
           }
@@ -76,7 +140,12 @@ const Sidebar = ({
         />
       </div>
 
-      <div style={styles.chatList}>
+      <div
+        style={{
+          ...styles.chatList,
+          ...(isMobile ? styles.chatListMobile : {}),
+        }}
+      >
         {chats.length === 0 ? (
           <div style={styles.emptyStateSidebar}>
             <MessageSquare
@@ -97,9 +166,16 @@ const Sidebar = ({
                 key={chat.id}
                 style={{
                   ...styles.chatItem,
+                  ...(isMobile ? styles.chatItemMobile : {}),
                   ...(activeChat === chat.id ? styles.chatItemActive : {}),
                 }}
-                onClick={() => setActiveChat(chat.id)}
+                onClick={() => {
+                  setActiveChat(chat.id);
+                  // Close mobile sidebar when selecting chat
+                  if (isMobile && setShowMobileSidebar) {
+                    setShowMobileSidebar(false);
+                  }
+                }}
                 onMouseEnter={(e) => {
                   if (activeChat !== chat.id) {
                     e.currentTarget.style.backgroundColor = "#101a22";
@@ -127,17 +203,39 @@ const Sidebar = ({
                       marginBottom: "2px",
                     }}
                   >
-                    <div style={styles.chatTitle}>{chat.title}</div>
-                    <div style={{ fontSize: "11px", color: "#6b7280" }}>
+                    <div
+                      style={{
+                        ...styles.chatTitle,
+                        ...(isMobile ? styles.chatTitleMobile : {}),
+                      }}
+                    >
+                      {chat.title}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: isMobile ? "12px" : "11px",
+                        color: "#6b7280",
+                      }}
+                    >
                       {chat.lastActive}
                     </div>
                   </div>
-                  <div style={styles.chatPreview}>{chat.preview}</div>
+                  <div
+                    style={{
+                      ...styles.chatPreview,
+                      ...(isMobile ? styles.chatPreviewMobile : {}),
+                    }}
+                  >
+                    {chat.preview}
+                  </div>
                 </div>
                 <div style={styles.chatMenu}>
                   <button
                     data-menu-btn
-                    style={styles.menuButton}
+                    style={{
+                      ...styles.menuButton,
+                      ...(isMobile ? styles.menuButtonMobile : {}),
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowChatMenu(
@@ -148,9 +246,17 @@ const Sidebar = ({
                     <MoreVertical size={16} />
                   </button>
                   {showChatMenu === chat.id && (
-                    <div style={styles.menuDropdown}>
+                    <div
+                      style={{
+                        ...styles.menuDropdown,
+                        ...(isMobile ? styles.menuDropdownMobile : {}),
+                      }}
+                    >
                       <div
-                        style={styles.menuItem}
+                        style={{
+                          ...styles.menuItem,
+                          ...(isMobile ? styles.menuItemMobile : {}),
+                        }}
                         onMouseEnter={(e) =>
                           (e.currentTarget.style.backgroundColor =
                             "rgba(255, 255, 255, 0.1)")
@@ -165,7 +271,10 @@ const Sidebar = ({
                         Rename
                       </div>
                       <div
-                        style={styles.menuItem}
+                        style={{
+                          ...styles.menuItem,
+                          ...(isMobile ? styles.menuItemMobile : {}),
+                        }}
                         onMouseEnter={(e) =>
                           (e.currentTarget.style.backgroundColor =
                             "rgba(255, 255, 255, 0.1)")
@@ -182,7 +291,10 @@ const Sidebar = ({
                         Pin Chat
                       </div>
                       <div
-                        style={styles.menuItem}
+                        style={{
+                          ...styles.menuItem,
+                          ...(isMobile ? styles.menuItemMobile : {}),
+                        }}
                         onMouseEnter={(e) =>
                           (e.currentTarget.style.backgroundColor =
                             "rgba(239, 68, 68, 0.1)")
@@ -206,8 +318,8 @@ const Sidebar = ({
 
       <div
         style={{
-          padding: "12px 16px",
-          fontSize: "11px",
+          padding: isMobile ? "16px 12px" : "12px 16px",
+          fontSize: isMobile ? "12px" : "11px",
           color: "#6b7280",
           textAlign: "center",
           borderTop: "1px solid rgba(255, 255, 255, 0.1)",
