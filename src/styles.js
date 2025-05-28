@@ -17,6 +17,8 @@ export const styles = {
   sidebarHeader: {
     padding: "20px 16px 16px",
     borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+    background:
+      "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%)",
   },
   logoSection: {
     display: "flex",
@@ -30,6 +32,10 @@ export const styles = {
     display: "flex",
     alignItems: "center",
     gap: "8px",
+    background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    backgroundClip: "text",
   },
   settingsButton: {
     padding: "6px",
@@ -41,7 +47,7 @@ export const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    transition: "background-color 0.2s",
+    transition: "all 0.2s",
   },
   tokenBar: {
     height: "4px",
@@ -51,15 +57,16 @@ export const styles = {
   },
   tokenProgress: {
     height: "100%",
-    backgroundColor: "#f0b86c",
+    background: "linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%)",
     borderRadius: "2px",
     transition: "width 0.3s ease",
+    boxShadow: "0 0 10px rgba(245, 158, 11, 0.3)",
   },
   newChatButton: {
     width: "100%",
-    padding: "10px",
-    backgroundColor: "#f0b86c",
-    color: "#000000",
+    padding: "12px",
+    background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+    color: "#0f172a",
     border: "none",
     borderRadius: "8px",
     fontSize: "14px",
@@ -71,6 +78,7 @@ export const styles = {
     gap: "8px",
     marginTop: "12px",
     transition: "all 0.2s",
+    boxShadow: "0 4px 12px rgba(245, 158, 11, 0.3)",
   },
   searchContainer: {
     padding: "12px 16px",
@@ -114,8 +122,10 @@ export const styles = {
     transition: "all 0.2s",
   },
   chatItemActive: {
-    backgroundColor: "rgba(240, 184, 108, 0.1)",
-    border: "1px solid rgba(240, 184, 108, 0.3)",
+    background:
+      "linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.1) 100%)",
+    border: "1px solid rgba(245, 158, 11, 0.3)",
+    boxShadow: "0 2px 8px rgba(245, 158, 11, 0.2)",
   },
   chatInfo: {
     flex: 1,
@@ -188,6 +198,9 @@ export const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+    background:
+      "linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.6) 100%)",
+    backdropFilter: "blur(10px)",
   },
   chatHeaderInfo: {
     display: "flex",
@@ -283,7 +296,7 @@ export const styles = {
     width: "8px",
     height: "8px",
     borderRadius: "50%",
-    backgroundColor: "#f0b86c",
+    background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
     animation: "pulse 1.4s infinite",
   },
   inputContainer: {
@@ -311,11 +324,11 @@ export const styles = {
     maxHeight: "120px",
   },
   sendButton: {
-    padding: "8px 16px",
-    backgroundColor: "#f0b86c",
+    padding: "10px 16px",
+    background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
     border: "none",
     borderRadius: "8px",
-    color: "#000000",
+    color: "#0f172a",
     fontSize: "14px",
     fontWeight: "600",
     cursor: "pointer",
@@ -323,6 +336,7 @@ export const styles = {
     alignItems: "center",
     gap: "6px",
     transition: "all 0.2s",
+    boxShadow: "0 4px 12px rgba(245, 158, 11, 0.3)",
   },
   tokenWarning: {
     padding: "8px 12px",
@@ -416,8 +430,9 @@ export const styles = {
     border: "none",
   },
   modalPrimaryButton: {
-    backgroundColor: "#f0b86c",
-    color: "#000000",
+    background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+    color: "#0f172a",
+    boxShadow: "0 4px 12px rgba(245, 158, 11, 0.3)",
   },
   modalSecondaryButton: {
     backgroundColor: "#101a22",
@@ -430,11 +445,12 @@ export const styles = {
     right: 0,
     width: "400px",
     height: "100vh",
-    backgroundColor: "#070c10",
+    background: "linear-gradient(180deg, #070c10 0%, #0b1117 100%)",
     borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
     overflowY: "auto",
     transition: "transform 0.3s ease",
     zIndex: 999,
+    boxShadow: "-4px 0 20px rgba(0, 0, 0, 0.3)",
   },
   settingsHeader: {
     padding: "20px",
@@ -442,6 +458,8 @@ export const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+    background:
+      "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%)",
   },
   settingsTitle: {
     fontSize: "20px",
@@ -489,20 +507,24 @@ export const styles = {
   walletBalance: {
     fontSize: "24px",
     fontWeight: "700",
-    color: "#f0b86c",
+    background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    backgroundClip: "text",
     marginBottom: "8px",
   },
   topUpButton: {
     width: "100%",
-    padding: "10px",
-    backgroundColor: "#f0b86c",
-    color: "#000000",
+    padding: "12px",
+    background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+    color: "#0f172a",
     border: "none",
     borderRadius: "6px",
     fontSize: "14px",
     fontWeight: "600",
     cursor: "pointer",
     transition: "all 0.2s",
+    boxShadow: "0 4px 12px rgba(245, 158, 11, 0.3)",
   },
   cardItem: {
     display: "flex",
@@ -538,7 +560,7 @@ export const styles = {
     transition: "transform 0.3s",
   },
   toggleActive: {
-    backgroundColor: "#f0b86c",
+    background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
   },
   transactionItem: {
     display: "flex",
@@ -569,9 +591,9 @@ export const styles = {
     lineHeight: "1.5",
   },
   buyButton: {
-    padding: "6px 16px",
-    backgroundColor: "#f0b86c",
-    color: "#000000",
+    padding: "8px 16px",
+    background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+    color: "#0f172a",
     border: "none",
     borderRadius: "6px",
     fontSize: "14px",
@@ -579,5 +601,6 @@ export const styles = {
     cursor: "pointer",
     transition: "all 0.2s",
     width: "auto",
+    boxShadow: "0 2px 8px rgba(245, 158, 11, 0.3)",
   },
 };
