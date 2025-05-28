@@ -1396,7 +1396,15 @@ const AIChatInterface = () => {
           }}
         >
           <div style={styles.settingsHeader}>
-            <h2 style={styles.settingsTitle}>Settings</h2>
+            <h2
+              style={{
+                ...styles.settingsTitle,
+                fontSize: isMobile ? "16px" : "18px", // Match chat header font size exactly
+                margin: 0, // Ensure no margin like chat header
+              }}
+            >
+              Settings
+            </h2>
             <button
               style={{ ...styles.settingsButton, padding: "8px" }}
               onClick={() => setShowSettings(false)}
