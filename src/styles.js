@@ -736,7 +736,7 @@ export const styles = {
     transform: "translateX(0)",
   },
   settingsHeader: {
-    padding: "20px",
+    padding: "16px 20px",
     borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
     background:
       "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%)",
@@ -745,7 +745,7 @@ export const styles = {
     justifyContent: "space-between",
   },
   settingsHeaderMobile: {
-    padding: "16px",
+    padding: "12px 16px",
   },
   settingsTitle: {
     fontSize: "18px",
@@ -777,10 +777,10 @@ export const styles = {
     minHeight: "44px",
   },
   settingsContent: {
-    padding: "20px",
+    padding: "24px",
   },
   settingsContentMobile: {
-    padding: "16px",
+    padding: "20px",
   },
   settingsSection: {
     marginBottom: "24px",

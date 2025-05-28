@@ -1411,357 +1411,371 @@ const AIChatInterface = () => {
             </button>
           </div>
 
-          {/* Only show AI Assistant Usage section if user has purchased messages */}
-          {messageAllowance.purchasedAvailable > 0 && (
-            <div style={styles.settingsSection}>
-              <h3 style={styles.sectionTitle}>AI Assistant Usage</h3>
-              <div style={styles.settingsItem}>
-                <div style={styles.settingsLabel}>Messages Remaining</div>
-                <div style={styles.usageBar}>
-                  <div style={styles.settingsValue}>
-                    {messageAllowance.purchasedAvailable} Messages Available
-                  </div>
-                </div>
-                <div style={styles.tokenBar}>
-                  <div
-                    style={{
-                      ...styles.tokenProgress,
-                      width: "100%", // Show full bar for purchased messages
-                      backgroundColor: "#f0b86c",
-                    }}
-                  />
-                </div>
-              </div>
-              <button
-                style={styles.topUpButton}
-                onClick={() => {
-                  messagePacksRef.current?.scrollIntoView({
-                    behavior: "smooth",
-                  });
-                }}
-              >
-                Get More Messages
-              </button>
-            </div>
-          )}
-
-          <div style={styles.settingsSection}>
-            <h3 style={styles.sectionTitle}>Payment & Billing</h3>
-            {platformCardInfo ? (
-              <div
-                style={{
-                  ...styles.cardItem,
-                  ...(isMobile ? styles.cardItemMobile : {}),
-                }}
-              >
-                <div
-                  style={{
-                    ...styles.cardInfo,
-                    ...(isMobile ? styles.cardInfoMobile : {}),
-                  }}
-                >
-                  <CreditCard size={20} />
-                  <div>
-                    <div style={{ fontSize: "14px" }}>
-                      {platformCardInfo.type} ****{platformCardInfo.last4}
-                    </div>
-                    <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                      Expires {platformCardInfo.expires}
+          {/* Settings Content Wrapper */}
+          <div
+            style={{
+              ...styles.settingsContent,
+              ...(isMobile ? styles.settingsContentMobile : {}),
+            }}
+          >
+            {/* Only show AI Assistant Usage section if user has purchased messages */}
+            {messageAllowance.purchasedAvailable > 0 && (
+              <div style={styles.settingsSection}>
+                <h3 style={styles.sectionTitle}>AI Assistant Usage</h3>
+                <div style={styles.settingsItem}>
+                  <div style={styles.settingsLabel}>Messages Remaining</div>
+                  <div style={styles.usageBar}>
+                    <div style={styles.settingsValue}>
+                      {messageAllowance.purchasedAvailable} Messages Available
                     </div>
                   </div>
-                </div>
-                <button
-                  onClick={() => alert("Link to main platform billing page")}
-                  style={{
-                    ...styles.actionButton,
-                    border: "none",
-                    padding: "4px 8px",
-                    fontSize: "12px",
-                  }}
-                >
-                  Manage Card
-                </button>
-              </div>
-            ) : (
-              <>
-                <p
-                  style={{
-                    fontSize: "14px",
-                    color: "#6b7280",
-                    marginBottom: "8px",
-                  }}
-                >
-                  To purchase message packs or enable automatic refill, please
-                  add a payment card to your platform account.
-                </p>
-                <button
-                  onClick={() =>
-                    alert("TODO: Link to main platform page to add a card")
-                  }
-                  style={{
-                    ...styles.topUpButton,
-                    width: "100%",
-                    marginBottom: "8px",
-                  }}
-                >
-                  + Add Payment Card
-                </button>
-                <p style={{ fontSize: "12px", color: "#6b7280" }}>
-                  Alternatively, you can top up your wallet with crypto and
-                  purchase message packs using your wallet balance.
-                </p>
-              </>
-            )}
-          </div>
-
-          <div style={styles.settingsSection}>
-            <h3 style={styles.sectionTitle}>Wallet</h3>
-            <div
-              style={{
-                ...styles.walletCard,
-                ...(isMobile ? styles.walletCardMobile : {}),
-              }}
-            >
-              <div style={styles.settingsLabel}>Current Balance</div>
-              <div
-                style={{
-                  ...styles.walletBalance,
-                  ...(isMobile ? styles.walletBalanceMobile : {}),
-                }}
-              >
-                ${walletBalance.toFixed(2)} USD
-              </div>
-              <button
-                style={{
-                  ...styles.topUpButton,
-                  ...(isMobile ? styles.topUpButtonMobile : {}),
-                }}
-              >
-                <Wallet size={16} style={{ marginRight: "6px" }} />
-                Top Up Wallet
-              </button>
-            </div>
-
-            <div style={styles.settingsItem}>
-              <h4
-                style={{
-                  fontSize: "14px",
-                  marginBottom: "12px",
-                  color: "#ffffff",
-                  fontWeight: "600",
-                }}
-              >
-                Automatic Message Refill
-              </h4>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: "16px",
-                  padding: "8px 0",
-                }}
-              >
-                <span style={{ fontSize: "14px", color: "#ffffff" }}>
-                  Enable Automatic Message Refill
-                </span>
-                <div
-                  style={{
-                    ...styles.toggleSwitch,
-                    ...(isMobile ? styles.toggleSwitchMobile : {}),
-                    ...(autoRefillMessages.enabled ? styles.toggleActive : {}),
-                  }}
-                  onClick={() =>
-                    setAutoRefillMessages((prev) => ({
-                      ...prev,
-                      enabled: !prev.enabled,
-                    }))
-                  }
-                >
-                  <div
-                    style={{
-                      ...styles.toggleSlider,
-                      ...(isMobile ? styles.toggleSliderMobile : {}),
-                      transform: autoRefillMessages.enabled
-                        ? "translateX(20px)"
-                        : "translateX(0)",
-                    }}
-                  />
-                </div>
-              </div>
-              {autoRefillMessages.enabled && (
-                <div
-                  style={{
-                    padding: "16px",
-                    backgroundColor: "#101a22",
-                    borderRadius: "8px",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                  }}
-                >
-                  <div style={{ marginBottom: "16px" }}>
-                    <label
+                  <div style={styles.tokenBar}>
+                    <div
                       style={{
-                        ...styles.settingsLabel,
-                        display: "block",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      When messages remaining fall below:
-                    </label>
-                    <input
-                      type="number"
-                      value={autoRefillMessages.thresholdMessages}
-                      onChange={(e) =>
-                        setAutoRefillMessages((prev) => ({
-                          ...prev,
-                          thresholdMessages: e.target.value,
-                        }))
-                      }
-                      style={{
-                        ...styles.titleInput,
-                        width: "100%",
-                        fontSize: "14px",
-                        padding: "8px 12px",
-                        backgroundColor: "#0b1117",
-                        border: "1px solid rgba(255, 255, 255, 0.2)",
-                        borderRadius: "6px",
-                        color: "#ffffff",
+                        ...styles.tokenProgress,
+                        width: "100%", // Show full bar for purchased messages
+                        backgroundColor: "#f0b86c",
                       }}
                     />
                   </div>
-                  <div style={{ marginBottom: "16px" }}>
-                    <label
-                      style={{
-                        ...styles.settingsLabel,
-                        display: "block",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      Automatically purchase:
-                    </label>
-                    <select
-                      value={autoRefillMessages.packToPurchase.packName}
-                      onChange={(e) => {
-                        const selectedPack = MESSAGE_PACK_OPTIONS.find(
-                          (p) => p.packName === e.target.value
-                        );
-                        setAutoRefillMessages((prev) => ({
-                          ...prev,
-                          packToPurchase: selectedPack,
-                        }));
-                      }}
-                      style={{
-                        ...styles.titleInput,
-                        width: "100%",
-                        fontSize: "14px",
-                        padding: "8px 12px",
-                        backgroundColor: "#0b1117",
-                        border: "1px solid rgba(255, 255, 255, 0.2)",
-                        borderRadius: "6px",
-                        color: "#ffffff",
-                      }}
-                    >
-                      {MESSAGE_PACK_OPTIONS.map((pack) => (
-                        <option key={pack.packName} value={pack.packName}>
-                          {pack.packName} (${pack.price.toFixed(2)})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#6b7280",
-                      marginTop: "8px",
-                    }}
-                  >
-                    This will use your Wallet balance if sufficient.
-                    {platformCardInfo &&
-                      ` Otherwise, your card on file (${platformCardInfo.type} ****${platformCardInfo.last4}) will be used.`}
-                    {!platformCardInfo &&
-                      ` Please ensure you have a card on file if wallet balance is low.`}
-                  </div>
                 </div>
-              )}
-            </div>
-          </div>
+                <button
+                  style={styles.topUpButton}
+                  onClick={() => {
+                    messagePacksRef.current?.scrollIntoView({
+                      behavior: "smooth",
+                    });
+                  }}
+                >
+                  Get More Messages
+                </button>
+              </div>
+            )}
 
-          {/* Message Packs */}
-          <div ref={messagePacksRef} style={styles.settingsSection}>
-            <h3 style={styles.sectionTitle}>Message Packs</h3>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
-            >
-              {MESSAGE_PACK_OPTIONS.map((pack) => (
+            <div style={styles.settingsSection}>
+              <h3 style={styles.sectionTitle}>Payment & Billing</h3>
+              {platformCardInfo ? (
                 <div
-                  key={pack.packName}
                   style={{
                     ...styles.cardItem,
                     ...(isMobile ? styles.cardItemMobile : {}),
                   }}
                 >
-                  <div>
-                    <div style={{ fontSize: "14px", fontWeight: "600" }}>
-                      {pack.packName}
-                    </div>
-                    <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                      ${pack.price.toFixed(2)}
+                  <div
+                    style={{
+                      ...styles.cardInfo,
+                      ...(isMobile ? styles.cardInfoMobile : {}),
+                    }}
+                  >
+                    <CreditCard size={20} />
+                    <div>
+                      <div style={{ fontSize: "14px" }}>
+                        {platformCardInfo.type} ****{platformCardInfo.last4}
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                        Expires {platformCardInfo.expires}
+                      </div>
                     </div>
                   </div>
                   <button
-                    onClick={() => handleBuyPack(pack)}
+                    onClick={() => alert("Link to main platform billing page")}
                     style={{
-                      ...styles.buyButton,
-                      ...(isMobile ? styles.buyButtonMobile : {}),
+                      ...styles.actionButton,
+                      border: "none",
+                      padding: "4px 8px",
+                      fontSize: "12px",
                     }}
-                    disabled={!platformCardInfo && walletBalance < pack.price}
                   >
-                    Buy
+                    Manage Card
                   </button>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Transaction History */}
-          <div style={styles.settingsSection}>
-            <h3 style={styles.sectionTitle}>Transaction History</h3>
-            <div style={{ maxHeight: "200px", overflowY: "auto" }}>
-              {transactionHistory.length > 0 ? (
-                transactionHistory.map((item) => (
-                  <div
-                    key={item.id}
+              ) : (
+                <>
+                  <p
                     style={{
-                      ...styles.transactionItem,
-                      ...(isMobile ? styles.transactionItemMobile : {}),
+                      fontSize: "14px",
+                      color: "#6b7280",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    To purchase message packs or enable automatic refill, please
+                    add a payment card to your platform account.
+                  </p>
+                  <button
+                    onClick={() =>
+                      alert("TODO: Link to main platform page to add a card")
+                    }
+                    style={{
+                      ...styles.topUpButton,
+                      width: "100%",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    + Add Payment Card
+                  </button>
+                  <p style={{ fontSize: "12px", color: "#6b7280" }}>
+                    Alternatively, you can top up your wallet with crypto and
+                    purchase message packs using your wallet balance.
+                  </p>
+                </>
+              )}
+            </div>
+
+            <div style={styles.settingsSection}>
+              <h3 style={styles.sectionTitle}>Wallet</h3>
+              <div
+                style={{
+                  ...styles.walletCard,
+                  ...(isMobile ? styles.walletCardMobile : {}),
+                }}
+              >
+                <div style={styles.settingsLabel}>Current Balance</div>
+                <div
+                  style={{
+                    ...styles.walletBalance,
+                    ...(isMobile ? styles.walletBalanceMobile : {}),
+                  }}
+                >
+                  ${walletBalance.toFixed(2)} USD
+                </div>
+                <button
+                  style={{
+                    ...styles.topUpButton,
+                    ...(isMobile ? styles.topUpButtonMobile : {}),
+                  }}
+                >
+                  <Wallet size={16} style={{ marginRight: "6px" }} />
+                  Top Up Wallet
+                </button>
+              </div>
+
+              <div style={styles.settingsItem}>
+                <h4
+                  style={{
+                    fontSize: "14px",
+                    marginBottom: "12px",
+                    color: "#ffffff",
+                    fontWeight: "600",
+                  }}
+                >
+                  Automatic Message Refill
+                </h4>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "16px",
+                    padding: "8px 0",
+                  }}
+                >
+                  <span style={{ fontSize: "14px", color: "#ffffff" }}>
+                    Enable Automatic Message Refill
+                  </span>
+                  <div
+                    style={{
+                      ...styles.toggleSwitch,
+                      ...(isMobile ? styles.toggleSwitchMobile : {}),
+                      ...(autoRefillMessages.enabled
+                        ? styles.toggleActive
+                        : {}),
+                    }}
+                    onClick={() =>
+                      setAutoRefillMessages((prev) => ({
+                        ...prev,
+                        enabled: !prev.enabled,
+                      }))
+                    }
+                  >
+                    <div
+                      style={{
+                        ...styles.toggleSlider,
+                        ...(isMobile ? styles.toggleSliderMobile : {}),
+                        transform: autoRefillMessages.enabled
+                          ? "translateX(20px)"
+                          : "translateX(0)",
+                      }}
+                    />
+                  </div>
+                </div>
+                {autoRefillMessages.enabled && (
+                  <div
+                    style={{
+                      padding: "16px",
+                      backgroundColor: "#101a22",
+                      borderRadius: "8px",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                    }}
+                  >
+                    <div style={{ marginBottom: "16px" }}>
+                      <label
+                        style={{
+                          ...styles.settingsLabel,
+                          display: "block",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        When messages remaining fall below:
+                      </label>
+                      <input
+                        type="number"
+                        value={autoRefillMessages.thresholdMessages}
+                        onChange={(e) =>
+                          setAutoRefillMessages((prev) => ({
+                            ...prev,
+                            thresholdMessages: e.target.value,
+                          }))
+                        }
+                        style={{
+                          ...styles.titleInput,
+                          width: "100%",
+                          fontSize: "14px",
+                          padding: "8px 12px",
+                          backgroundColor: "#0b1117",
+                          border: "1px solid rgba(255, 255, 255, 0.2)",
+                          borderRadius: "6px",
+                          color: "#ffffff",
+                        }}
+                      />
+                    </div>
+                    <div style={{ marginBottom: "16px" }}>
+                      <label
+                        style={{
+                          ...styles.settingsLabel,
+                          display: "block",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        Automatically purchase:
+                      </label>
+                      <select
+                        value={autoRefillMessages.packToPurchase.packName}
+                        onChange={(e) => {
+                          const selectedPack = MESSAGE_PACK_OPTIONS.find(
+                            (p) => p.packName === e.target.value
+                          );
+                          setAutoRefillMessages((prev) => ({
+                            ...prev,
+                            packToPurchase: selectedPack,
+                          }));
+                        }}
+                        style={{
+                          ...styles.titleInput,
+                          width: "100%",
+                          fontSize: "14px",
+                          padding: "8px 12px",
+                          backgroundColor: "#0b1117",
+                          border: "1px solid rgba(255, 255, 255, 0.2)",
+                          borderRadius: "6px",
+                          color: "#ffffff",
+                        }}
+                      >
+                        {MESSAGE_PACK_OPTIONS.map((pack) => (
+                          <option key={pack.packName} value={pack.packName}>
+                            {pack.packName} (${pack.price.toFixed(2)})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "#6b7280",
+                        marginTop: "8px",
+                      }}
+                    >
+                      This will use your Wallet balance if sufficient.
+                      {platformCardInfo &&
+                        ` Otherwise, your card on file (${platformCardInfo.type} ****${platformCardInfo.last4}) will be used.`}
+                      {!platformCardInfo &&
+                        ` Please ensure you have a card on file if wallet balance is low.`}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Message Packs */}
+            <div ref={messagePacksRef} style={styles.settingsSection}>
+              <h3 style={styles.sectionTitle}>Message Packs</h3>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: "8px" }}
+              >
+                {MESSAGE_PACK_OPTIONS.map((pack) => (
+                  <div
+                    key={pack.packName}
+                    style={{
+                      ...styles.cardItem,
+                      ...(isMobile ? styles.cardItemMobile : {}),
                     }}
                   >
                     <div>
-                      <div style={{ fontSize: "14px" }}>{item.description}</div>
+                      <div style={{ fontSize: "14px", fontWeight: "600" }}>
+                        {pack.packName}
+                      </div>
                       <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                        {item.date}
+                        ${pack.price.toFixed(2)}
                       </div>
                     </div>
-                    <div
-                      style={{ color: item.amount < 0 ? "#ef4444" : "#10b981" }}
+                    <button
+                      onClick={() => handleBuyPack(pack)}
+                      style={{
+                        ...styles.buyButton,
+                        ...(isMobile ? styles.buyButtonMobile : {}),
+                      }}
+                      disabled={!platformCardInfo && walletBalance < pack.price}
                     >
-                      {item.amount < 0 ? "-" : "+"}$
-                      {Math.abs(item.amount).toFixed(2)}
-                    </div>
+                      Buy
+                    </button>
                   </div>
-                ))
-              ) : (
-                <p
-                  style={{
-                    fontSize: "14px",
-                    color: "#6b7280",
-                    textAlign: "center",
-                    padding: "20px",
-                  }}
-                >
-                  No AI Assistant transactions yet.
-                </p>
-              )}
+                ))}
+              </div>
+            </div>
+
+            {/* Transaction History */}
+            <div style={styles.settingsSection}>
+              <h3 style={styles.sectionTitle}>Transaction History</h3>
+              <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+                {transactionHistory.length > 0 ? (
+                  transactionHistory.map((item) => (
+                    <div
+                      key={item.id}
+                      style={{
+                        ...styles.transactionItem,
+                        ...(isMobile ? styles.transactionItemMobile : {}),
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: "14px" }}>
+                          {item.description}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                          {item.date}
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          color: item.amount < 0 ? "#ef4444" : "#10b981",
+                        }}
+                      >
+                        {item.amount < 0 ? "-" : "+"}$
+                        {Math.abs(item.amount).toFixed(2)}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      color: "#6b7280",
+                      textAlign: "center",
+                      padding: "20px",
+                    }}
+                  >
+                    No AI Assistant transactions yet.
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
