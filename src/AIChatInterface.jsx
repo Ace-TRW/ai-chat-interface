@@ -33,9 +33,25 @@ import {
   Paperclip,
   Mic,
   CheckSquare,
+  Send,
+  ArrowLeft,
+  StopCircle,
 } from "lucide-react";
 import { styles } from "./styles";
 import Sidebar from "./components/Sidebar";
+
+// Message pack constants for consistency
+const MESSAGE_PACK_OPTIONS = [
+  { packName: "100 Messages", price: 1.0, messages: 100, perMessage: 0.01 },
+  { packName: "250 Messages", price: 2.1, messages: 250, perMessage: 0.0084 },
+  { packName: "1000 Messages", price: 7.5, messages: 1000, perMessage: 0.0075 },
+  {
+    packName: "5000 Messages",
+    price: 33.0,
+    messages: 5000,
+    perMessage: 0.0066,
+  },
+];
 
 const AIChatInterface = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,7 +67,7 @@ const AIChatInterface = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showOutOfMessagesModal, setShowOutOfMessagesModal] = useState(false);
   const [messageAllowance, setMessageAllowance] = useState({
-    freeUsed: 25,
+    freeUsed: 0,
     freeTotal: 30,
     purchasedAvailable: 0,
   });
@@ -59,12 +75,12 @@ const AIChatInterface = () => {
   const [autoRefillMessages, setAutoRefillMessages] = useState({
     enabled: false,
     thresholdMessages: 5,
-    packToPurchase: { packName: "100 Messages", price: 1.0, messages: 100 },
+    packToPurchase: MESSAGE_PACK_OPTIONS[0], // Default to first option
   });
-  const [resetTime, setResetTime] = useState({
-    days: 5,
-    hours: 14,
-    minutes: 32,
+  const [resetTimer, setResetTimer] = useState({
+    hours: 23,
+    minutes: 45,
+    seconds: 30,
   });
   const [messageFeedback, setMessageFeedback] = useState({});
   const [hoveredMessage, setHoveredMessage] = useState(null);
@@ -83,7 +99,7 @@ const AIChatInterface = () => {
   const [transactionHistory, setTransactionHistory] = useState([]);
   const [showPurchaseModal, setShowPurchaseModal] = useState(null);
   const [selectedPurchaseMethod, setSelectedPurchaseMethod] =
-    useState("platformCard");
+    useState("wallet");
 
   // Simulate fetching platform card (in a real app, from API/context)
   useEffect(() => {
@@ -98,28 +114,23 @@ const AIChatInterface = () => {
   // Update reset timer
   useEffect(() => {
     const timer = setInterval(() => {
-      setResetTime((prev) => {
-        let { days, hours, minutes } = prev;
-        minutes--;
-        if (minutes < 0) {
-          minutes = 59;
-          hours--;
-          if (hours < 0) {
-            hours = 23;
-            days--;
-            if (days < 0) {
-              // Reset only the free allowance, keep purchased messages
-              setMessageAllowance((prev) => ({
-                ...prev,
-                freeUsed: 0,
-              }));
-              return { days: 30, hours: 0, minutes: 0 };
-            }
-          }
+      setResetTimer((prev) => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 };
+        } else if (prev.minutes > 0) {
+          return { hours: prev.hours, minutes: prev.minutes - 1, seconds: 59 };
+        } else if (prev.hours > 0) {
+          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        } else {
+          // Reset free messages when timer reaches 0
+          setMessageAllowance((prev) => ({
+            ...prev,
+            freeUsed: 0,
+          }));
+          return { hours: 23, minutes: 59, seconds: 59 };
         }
-        return { days, hours, minutes };
       });
-    }, 60000); // Update every minute
+    }, 1000);
 
     return () => clearInterval(timer);
   }, []);
@@ -204,117 +215,156 @@ const AIChatInterface = () => {
     }
   }, [messages, activeChat]);
 
+  // Calculate total messages available
+  const totalMessagesAvailable =
+    messageAllowance.freeTotal -
+    messageAllowance.freeUsed +
+    messageAllowance.purchasedAvailable;
+
+  // Auto-scroll functionality - simplified and more common approach
+  useEffect(() => {
+    if (chatAreaRef.current) {
+      const { scrollHeight, clientHeight, scrollTop } = chatAreaRef.current;
+      // Auto-scroll to bottom if user is already near the bottom or if it's an AI message
+      const lastMessage = messages[messages.length - 1];
+      if (
+        scrollHeight - clientHeight <= scrollTop + 150 || // User is near bottom (150px tolerance)
+        (lastMessage && lastMessage.role === "assistant" && !isTyping) // It's a new AI message
+      ) {
+        chatAreaRef.current.scrollTo({ top: scrollHeight, behavior: "smooth" });
+      }
+    }
+  }, [messages, isTyping]); // Trigger on new messages or when AI stops typing
+
   const handleSendMessage = () => {
-    if (messageInput.trim()) {
-      // Calculate total messages available
-      const freeMessagesRemaining =
-        messageAllowance.freeTotal - messageAllowance.freeUsed;
-      const totalMessagesAvailable =
-        freeMessagesRemaining + messageAllowance.purchasedAvailable;
+    if (!messageInput.trim() || totalMessagesAvailable <= 0) return;
 
-      // Check if user has messages remaining
-      if (totalMessagesAvailable <= 0) {
-        setShowOutOfMessagesModal(true);
-        return;
+    const newMessage = {
+      id: `msg-${Date.now()}`,
+      role: "user",
+      content: messageInput.trim(),
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    let currentActiveChatId = activeChat;
+    let currentMessagesForChat = [...messages]; // Start with current messages if any
+
+    // Handle chat creation or updating
+    if (chats.length === 0 || !chats.find((c) => c.id === activeChat)) {
+      // Create new chat
+      const newChatId = `chat-${Date.now()}`;
+      const newChat = {
+        id: newChatId,
+        title: messageInput.substring(0, 25) || "New Conversation",
+        preview: messageInput.substring(0, 30) + "...",
+        messages: [newMessage], // Start with the new user message
+        lastActive: "now",
+      };
+      setChats((prevChats) => [newChat, ...prevChats]); // Add to start for recency
+      setActiveChat(newChatId);
+      currentActiveChatId = newChatId;
+      currentMessagesForChat = [newMessage]; // Messages for this new chat
+    } else {
+      // Add to existing active chat
+      currentMessagesForChat = [...currentMessagesForChat, newMessage];
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === currentActiveChatId
+            ? {
+                ...chat,
+                messages: currentMessagesForChat,
+                preview: newMessage.content.substring(0, 30) + "...",
+                lastActive: "now",
+              }
+            : chat
+        )
+      );
+    }
+
+    setMessages(currentMessagesForChat); // Update main messages state
+    setMessageInput("");
+    setIsTyping(true);
+    setIsGenerating(true);
+
+    // Update message allowance (consume free messages first, then purchased)
+    setMessageAllowance((prev) => {
+      if (prev.freeUsed < prev.freeTotal) {
+        return { ...prev, freeUsed: prev.freeUsed + 1 };
+      } else {
+        return { ...prev, purchasedAvailable: prev.purchasedAvailable - 1 };
+      }
+    });
+
+    // Calculate messages remaining after this send for auto-refill logic
+    const messagesRemainingAfterThisSend = totalMessagesAvailable - 1;
+
+    // Auto-refill logic with payment priority (wallet first, then card)
+    if (
+      autoRefillMessages.enabled &&
+      messagesRemainingAfterThisSend <= autoRefillMessages.thresholdMessages &&
+      totalMessagesAvailable > 0 // totalMessagesAvailable *before* this send
+    ) {
+      const packToBuy = autoRefillMessages.packToPurchase;
+      let paymentMethodForAutoRefill = null;
+
+      if (walletBalance >= packToBuy.price) {
+        paymentMethodForAutoRefill = "wallet";
+      } else if (platformCardInfo) {
+        paymentMethodForAutoRefill = "platformCard";
       }
 
-      // Create first chat if none exist
-      if (chats.length === 0) {
-        const newChat = {
-          id: "chat-1",
-          title: "New Chat",
-          preview: messageInput.substring(0, 30) + "...",
-          messages: [],
-          lastActive: "now",
-        };
-        setChats([newChat]);
-        setActiveChat("chat-1");
+      if (paymentMethodForAutoRefill) {
+        console.log(
+          `Auto-refilling messages using ${paymentMethodForAutoRefill}...`
+        );
+        setTimeout(() => {
+          handleConfirmPurchase(packToBuy, paymentMethodForAutoRefill);
+          alert(
+            `${packToBuy.messages} messages automatically added using ${
+              paymentMethodForAutoRefill === "wallet"
+                ? "Wallet Balance"
+                : "your card"
+            }!`
+          );
+        }, 100);
+      } else {
+        console.log(
+          "Auto-refill failed: No sufficient funds in wallet and no card on file."
+        );
       }
+    }
 
-      const newMessage = {
-        id: messages.length + 1,
-        role: "user",
-        content: messageInput,
+    // Simulate AI response
+    setTimeout(() => {
+      const aiResponse = {
+        id: `msg-${Date.now()}-ai`,
+        role: "assistant",
+        content:
+          "This is a simulated AI response. In a real application, this would be generated by your AI model.",
         timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         }),
       };
 
-      setMessages([...messages, newMessage]);
-      setMessageInput("");
-      setIsTyping(true);
-      setIsGenerating(true);
-
-      // Update message allowance - use free messages first, then purchased
-      setMessageAllowance((prev) => {
-        let newFreeUsed = prev.freeUsed;
-        let newPurchasedAvailable = prev.purchasedAvailable;
-
-        if (prev.freeUsed < prev.freeTotal) {
-          newFreeUsed++;
-        } else if (prev.purchasedAvailable > 0) {
-          newPurchasedAvailable--;
-        }
-
-        return {
-          ...prev,
-          freeUsed: newFreeUsed,
-          purchasedAvailable: newPurchasedAvailable,
-        };
-      });
-
-      // Check for auto-refill after updating allowance
-      const tempFreeUsed =
-        messageAllowance.freeUsed < messageAllowance.freeTotal
-          ? messageAllowance.freeUsed + 1
-          : messageAllowance.freeTotal;
-      const tempPurchasedUsed =
-        messageAllowance.freeUsed < messageAllowance.freeTotal ? 0 : 1;
-
-      const messagesRemainingAfterThisSend =
-        messageAllowance.freeTotal -
-        tempFreeUsed +
-        (messageAllowance.purchasedAvailable - tempPurchasedUsed);
-
-      if (
-        autoRefillMessages.enabled &&
-        platformCardInfo &&
-        messagesRemainingAfterThisSend <=
-          autoRefillMessages.thresholdMessages &&
-        totalMessagesAvailable > 0
-      ) {
-        console.log("Auto-refilling messages...");
-        // Automatically purchase the selected pack using platform card
-        setTimeout(() => {
-          handleConfirmPurchase(
-            autoRefillMessages.packToPurchase,
-            "platformCard"
-          );
-          // Show a non-intrusive notification
-          alert(
-            `${autoRefillMessages.packToPurchase.messages} messages automatically added!`
-          );
-        }, 100); // Small delay to ensure state updates
-      }
-
-      // Simulate AI response
-      setTimeout(() => {
-        const aiResponse = {
-          id: messages.length + 2,
-          role: "assistant",
-          content:
-            "This is a simulated AI response. In a real implementation, this would be the actual AI response.",
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        };
-        setMessages((prev) => [...prev, aiResponse]);
-        setIsTyping(false);
-        setIsGenerating(false);
-      }, 2000);
-    }
+      const finalMessagesForChat = [...currentMessagesForChat, aiResponse];
+      setMessages(finalMessagesForChat); // Update main messages state for UI
+      setChats(
+        (
+          prevChats // Persist AI response to the correct chat object
+        ) =>
+          prevChats.map((chat) =>
+            chat.id === currentActiveChatId
+              ? { ...chat, messages: finalMessagesForChat }
+              : chat
+          )
+      );
+      setIsTyping(false);
+      setIsGenerating(false);
+    }, 2000);
   };
 
   const handleStopGeneration = () => {
@@ -335,53 +385,45 @@ const AIChatInterface = () => {
 
   // Purchase handling functions
   const handleBuyPack = (pack) => {
-    setSelectedPurchaseMethod(platformCardInfo ? "platformCard" : "wallet");
+    if (walletBalance >= pack.price) {
+      setSelectedPurchaseMethod("wallet");
+    } else if (platformCardInfo) {
+      setSelectedPurchaseMethod("platformCard");
+    } else {
+      setSelectedPurchaseMethod(""); // No valid payment method
+    }
     setShowPurchaseModal(pack);
   };
 
-  const handleConfirmPurchase = (packDetails, paymentMethod) => {
-    console.log(
-      `Attempting to purchase ${packDetails.packName} for $${packDetails.price} using ${paymentMethod}`
-    );
-
-    if (paymentMethod === "platformCard" && !platformCardInfo) {
-      alert("No platform card on file. Please add one in your main settings.");
-      setShowPurchaseModal(null);
-      return;
-    }
-
-    if (paymentMethod === "wallet" && walletBalance < packDetails.price) {
-      alert("Insufficient wallet balance.");
-      setShowPurchaseModal(null);
-      return;
-    }
-
-    // Simulate payment processing
+  const handleConfirmPurchase = (pack, paymentMethod) => {
     if (paymentMethod === "wallet") {
-      setWalletBalance((prev) => prev - packDetails.price);
+      setWalletBalance((prev) => prev - pack.price);
     }
+    // For platformCard, no balance change needed (charged to card)
 
     setMessageAllowance((prev) => ({
       ...prev,
-      purchasedAvailable: prev.purchasedAvailable + packDetails.messages,
+      purchasedAvailable: prev.purchasedAvailable + pack.messages,
     }));
 
-    setTransactionHistory((prev) => [
-      {
-        id: Date.now(),
-        description: `${packDetails.packName} Purchase`,
-        date: new Date().toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        }),
-        amount: -packDetails.price,
-      },
-      ...prev,
-    ]);
+    const transaction = {
+      id: `txn-${Date.now()}`,
+      type: "Message Pack Purchase",
+      amount: pack.price,
+      method: paymentMethod === "wallet" ? "Wallet Balance" : "Card",
+      date: new Date().toLocaleDateString(),
+      description: `${pack.messages} messages`,
+    };
 
+    setTransactionHistory((prev) => [transaction, ...prev]);
     setShowPurchaseModal(null);
-    alert(`${packDetails.packName} purchased successfully!`);
+  };
+
+  const handleGetMoreMessages = () => {
+    setShowSettings(true);
+    setTimeout(() => {
+      messagePacksRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   };
 
   return (
@@ -893,9 +935,8 @@ const AIChatInterface = () => {
                           cursor: "pointer",
                         }}
                       >
-                        Click Here
-                      </a>{" "}
-                      to add more.
+                        Get more messages
+                      </a>
                     </span>
                   </div>
                 )}
@@ -904,12 +945,12 @@ const AIChatInterface = () => {
                   <div style={styles.tokenWarning}>
                     <AlertCircle size={16} />
                     <span>
-                      You've used all your messages.{" "}
+                      You're out of messages.{" "}
                       <a
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          setShowSettings(true);
+                          handleGetMoreMessages();
                         }}
                         style={{
                           color: "#f0b86c",
@@ -917,9 +958,9 @@ const AIChatInterface = () => {
                           cursor: "pointer",
                         }}
                       >
-                        Click Here
+                        Purchase more messages
                       </a>{" "}
-                      to add more.
+                      to continue chatting.
                     </span>
                   </div>
                 )}
@@ -1138,12 +1179,10 @@ const AIChatInterface = () => {
                 />
               </div>
               <div style={styles.resetTimer}>
-                <Timer
-                  size={12}
-                  style={{ display: "inline", marginRight: "4px" }}
-                />
-                Free messages reset in {resetTime.days}d {resetTime.hours}h{" "}
-                {resetTime.minutes}m
+                <span style={{ fontSize: "12px", color: "#6b7280" }}>
+                  Free messages reset in {resetTimer.hours}h{" "}
+                  {resetTimer.minutes}m {resetTimer.seconds}s
+                </span>
               </div>
             </div>
             <button
@@ -1295,30 +1334,9 @@ const AIChatInterface = () => {
                     <select
                       value={autoRefillMessages.packToPurchase.packName}
                       onChange={(e) => {
-                        const selectedPack =
-                          e.target.value === "100 Messages"
-                            ? {
-                                packName: "100 Messages",
-                                price: 1.0,
-                                messages: 100,
-                              }
-                            : e.target.value === "250 Messages"
-                            ? {
-                                packName: "250 Messages",
-                                price: 2.1,
-                                messages: 250,
-                              }
-                            : e.target.value === "1000 Messages"
-                            ? {
-                                packName: "1000 Messages",
-                                price: 7.5,
-                                messages: 1000,
-                              }
-                            : {
-                                packName: "5000 Messages",
-                                price: 33.0,
-                                messages: 5000,
-                              };
+                        const selectedPack = MESSAGE_PACK_OPTIONS.find(
+                          (p) => p.packName === e.target.value
+                        );
                         setAutoRefillMessages((prev) => ({
                           ...prev,
                           packToPurchase: selectedPack,
@@ -1335,22 +1353,26 @@ const AIChatInterface = () => {
                         color: "#ffffff",
                       }}
                     >
-                      <option value="100 Messages">100 Messages ($1.00)</option>
-                      <option value="250 Messages">250 Messages ($2.10)</option>
-                      <option value="1000 Messages">
-                        1000 Messages ($7.50)
-                      </option>
-                      <option value="5000 Messages">
-                        5000 Messages ($33.00)
-                      </option>
+                      {MESSAGE_PACK_OPTIONS.map((pack) => (
+                        <option key={pack.packName} value={pack.packName}>
+                          {pack.packName} (${pack.price.toFixed(2)})
+                        </option>
+                      ))}
                     </select>
                   </div>
-                  {platformCardInfo && (
-                    <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                      This will use your card on file ({platformCardInfo.type}{" "}
-                      ****{platformCardInfo.last4}).
-                    </div>
-                  )}
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#6b7280",
+                      marginTop: "8px",
+                    }}
+                  >
+                    This will use your Wallet balance if sufficient.
+                    {platformCardInfo &&
+                      ` Otherwise, your card on file (${platformCardInfo.type} ****${platformCardInfo.last4}) will be used.`}
+                    {!platformCardInfo &&
+                      ` Please ensure you have a card on file if wallet balance is low.`}
+                  </div>
                 </div>
               )}
             </div>
@@ -1362,110 +1384,26 @@ const AIChatInterface = () => {
             <div
               style={{ display: "flex", flexDirection: "column", gap: "8px" }}
             >
-              <div style={styles.cardItem}>
-                <div>
-                  <div style={{ fontSize: "14px", fontWeight: "600" }}>
-                    100 Messages
+              {MESSAGE_PACK_OPTIONS.map((pack) => (
+                <div key={pack.packName} style={styles.cardItem}>
+                  <div>
+                    <div style={{ fontSize: "14px", fontWeight: "600" }}>
+                      {pack.packName}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                      ${pack.price.toFixed(2)} (${pack.perMessage.toFixed(4)}{" "}
+                      per message)
+                    </div>
                   </div>
-                  <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                    $1.00 ($0.0100 per message)
-                  </div>
+                  <button
+                    onClick={() => handleBuyPack(pack)}
+                    style={styles.buyButton}
+                    disabled={!platformCardInfo && walletBalance < pack.price}
+                  >
+                    Buy
+                  </button>
                 </div>
-                <button
-                  onClick={() =>
-                    handleBuyPack({
-                      packName: "100 Messages",
-                      price: 1.0,
-                      messages: 100,
-                    })
-                  }
-                  style={{
-                    ...styles.topUpButton,
-                    width: "auto",
-                    padding: "6px 16px",
-                  }}
-                >
-                  Buy
-                </button>
-              </div>
-              <div style={styles.cardItem}>
-                <div>
-                  <div style={{ fontSize: "14px", fontWeight: "600" }}>
-                    250 Messages
-                  </div>
-                  <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                    $2.10 ($0.0084 per message)
-                  </div>
-                </div>
-                <button
-                  onClick={() =>
-                    handleBuyPack({
-                      packName: "250 Messages",
-                      price: 2.1,
-                      messages: 250,
-                    })
-                  }
-                  style={{
-                    ...styles.topUpButton,
-                    width: "auto",
-                    padding: "6px 16px",
-                  }}
-                >
-                  Buy
-                </button>
-              </div>
-              <div style={styles.cardItem}>
-                <div>
-                  <div style={{ fontSize: "14px", fontWeight: "600" }}>
-                    1000 Messages
-                  </div>
-                  <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                    $7.50 ($0.0075 per message)
-                  </div>
-                </div>
-                <button
-                  onClick={() =>
-                    handleBuyPack({
-                      packName: "1000 Messages",
-                      price: 7.5,
-                      messages: 1000,
-                    })
-                  }
-                  style={{
-                    ...styles.topUpButton,
-                    width: "auto",
-                    padding: "6px 16px",
-                  }}
-                >
-                  Buy
-                </button>
-              </div>
-              <div style={styles.cardItem}>
-                <div>
-                  <div style={{ fontSize: "14px", fontWeight: "600" }}>
-                    5000 Messages
-                  </div>
-                  <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                    $33.00 ($0.0066 per message)
-                  </div>
-                </div>
-                <button
-                  onClick={() =>
-                    handleBuyPack({
-                      packName: "5000 Messages",
-                      price: 33.0,
-                      messages: 5000,
-                    })
-                  }
-                  style={{
-                    ...styles.topUpButton,
-                    width: "auto",
-                    padding: "6px 16px",
-                  }}
-                >
-                  Buy
-                </button>
-              </div>
+              ))}
             </div>
           </div>
 

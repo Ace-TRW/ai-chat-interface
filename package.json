@@ -2,19 +2,16 @@
   "name": "ai-chat-interface",
   "version": "1.0.0",
   "description": "AI Chat Interface with React",
-  "main": "server.js",
+  "main": "src/index.js",
   "scripts": {
     "dev": "webpack serve --mode development",
     "build": "webpack --mode production",
-    "start": "node server.js",
-    "postinstall": "npm run build"
+    "start": "webpack serve --mode development"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "lucide-react": "^0.263.1",
-    "express": "^4.18.2",
-    "path": "^0.12.7"
+    "lucide-react": "^0.263.1"
   },
   "devDependencies": {
     "@babel/core": "^7.22.0",
