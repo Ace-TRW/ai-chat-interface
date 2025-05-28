@@ -83,6 +83,7 @@ const AIChatInterface = () => {
     enabled: false,
     thresholdMessages: 5,
     packToPurchase: MESSAGE_PACK_OPTIONS[0], // Default to first option
+    useWalletFirst: false, // New setting for wallet preference
   });
   const [resetTimer, setResetTimer] = useState({
     hours: 2,
@@ -381,7 +382,7 @@ const AIChatInterface = () => {
     // Calculate messages remaining after this send for auto-refill logic
     const messagesRemainingAfterThisSend = totalMessagesAvailable - 1;
 
-    // Auto-refill logic with payment priority (wallet first, then card)
+    // Auto-refill logic with payment priority based on user preference
     if (
       autoRefillMessages.enabled &&
       messagesRemainingAfterThisSend <= autoRefillMessages.thresholdMessages &&
@@ -390,10 +391,17 @@ const AIChatInterface = () => {
       const packToBuy = autoRefillMessages.packToPurchase;
       let paymentMethodForAutoRefill = null;
 
-      if (walletBalance >= packToBuy.price) {
+      // Check payment method based on user preference
+      if (
+        autoRefillMessages.useWalletFirst &&
+        walletBalance >= packToBuy.price
+      ) {
         paymentMethodForAutoRefill = "wallet";
       } else if (platformCardInfo) {
         paymentMethodForAutoRefill = "platformCard";
+      } else if (walletBalance >= packToBuy.price) {
+        // Fallback to wallet if no card and wallet has sufficient funds
+        paymentMethodForAutoRefill = "wallet";
       }
 
       if (paymentMethodForAutoRefill) {
@@ -1703,11 +1711,53 @@ const AIChatInterface = () => {
                         marginTop: "8px",
                       }}
                     >
-                      This will use your Wallet balance if sufficient.
-                      {platformCardInfo &&
-                        ` Otherwise, your card on file (${platformCardInfo.type} ****${platformCardInfo.last4}) will be used.`}
-                      {!platformCardInfo &&
-                        ` Please ensure you have a card on file if wallet balance is low.`}
+                      Payment method priority:
+                      {platformCardInfo && (
+                        <div style={{ marginTop: "8px" }}>
+                          <label
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              cursor: "pointer",
+                              fontSize: "12px",
+                              color: "#ffffff",
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={autoRefillMessages.useWalletFirst}
+                              onChange={(e) =>
+                                setAutoRefillMessages((prev) => ({
+                                  ...prev,
+                                  useWalletFirst: e.target.checked,
+                                }))
+                              }
+                              style={{ marginRight: "8px" }}
+                            />
+                            Use Wallet Balance first ($
+                            {walletBalance.toFixed(2)} available)
+                          </label>
+                          <div
+                            style={{
+                              fontSize: "11px",
+                              color: "#6b7280",
+                              marginTop: "4px",
+                              marginLeft: "20px",
+                            }}
+                          >
+                            {autoRefillMessages.useWalletFirst
+                              ? `Will use wallet first, then fall back to your card (${platformCardInfo.type} ****${platformCardInfo.last4})`
+                              : `Will use your card (${platformCardInfo.type} ****${platformCardInfo.last4}) as the primary payment method`}
+                          </div>
+                        </div>
+                      )}
+                      {!platformCardInfo && (
+                        <div style={{ marginTop: "8px", fontSize: "11px" }}>
+                          Will use Wallet Balance (${walletBalance.toFixed(2)}{" "}
+                          available). Please add a payment card for additional
+                          payment options.
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
