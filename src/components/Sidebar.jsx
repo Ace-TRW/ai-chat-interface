@@ -31,6 +31,7 @@ const Sidebar = ({
 }) => {
   return (
     <div
+      className="sidebar"
       style={{
         ...styles.sidebar,
         ...(isMobile ? styles.sidebarMobile : {}),
@@ -40,11 +41,11 @@ const Sidebar = ({
       {/* Mobile Close Button */}
       {isMobile && (
         <button
-          onClick={() => setShowMobileSidebar(false)}
           style={{
             ...styles.mobileCloseButton,
             ...styles.mobileCloseButtonVisible,
           }}
+          onClick={() => setShowMobileSidebar(false)}
         >
           <X size={20} />
         </button>
@@ -71,21 +72,24 @@ const Sidebar = ({
             <Bot size={isMobile ? 22 : 24} color="#f0b86c" />
             <span>AI Assistant</span>
           </div>
-          <button
-            style={{
-              ...styles.settingsButton,
-              ...(isMobile ? styles.settingsButtonMobile : {}),
-            }}
-            onClick={() => setShowSettings(!showSettings)}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "#101a22")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "transparent")
-            }
-          >
-            <Settings size={18} />
-          </button>
+          {/* Settings button - only show on desktop or move to bottom on mobile */}
+          {!isMobile && (
+            <button
+              style={{
+                ...styles.settingsButton,
+                ...(isMobile ? styles.settingsButtonMobile : {}),
+              }}
+              onClick={() => setShowSettings(!showSettings)}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#101a22")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "transparent")
+              }
+            >
+              <Settings size={18} />
+            </button>
+          )}
         </div>
 
         <button
@@ -93,15 +97,19 @@ const Sidebar = ({
             ...styles.newChatButton,
             ...(isMobile ? styles.newChatButtonMobile : {}),
           }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.transform = "scale(1.02)")
-          }
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           onClick={() => {
-            // Close mobile sidebar when creating new chat
-            if (isMobile && setShowMobileSidebar) {
+            setActiveChat(null);
+            if (isMobile) {
               setShowMobileSidebar(false);
             }
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#dc9a08";
+            e.currentTarget.style.transform = "translateY(-2px)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#f0b86c";
+            e.currentTarget.style.transform = "translateY(0)";
           }}
         >
           <Plus size={16} />
@@ -144,6 +152,8 @@ const Sidebar = ({
         style={{
           ...styles.chatList,
           ...(isMobile ? styles.chatListMobile : {}),
+          // Add padding bottom on mobile to make room for settings button
+          ...(isMobile ? { paddingBottom: "80px" } : {}),
         }}
       >
         {chats.length === 0 ? (
@@ -171,8 +181,7 @@ const Sidebar = ({
                 }}
                 onClick={() => {
                   setActiveChat(chat.id);
-                  // Close mobile sidebar when selecting chat
-                  if (isMobile && setShowMobileSidebar) {
+                  if (isMobile) {
                     setShowMobileSidebar(false);
                   }
                 }}
@@ -180,18 +189,18 @@ const Sidebar = ({
                   if (activeChat !== chat.id) {
                     e.currentTarget.style.backgroundColor = "#101a22";
                   }
-                  const menuBtn =
-                    e.currentTarget.querySelector("[data-menu-btn]");
-                  if (menuBtn) menuBtn.style.opacity = "1";
+                  e.currentTarget.querySelector(".menu-button").style.opacity =
+                    "1";
                 }}
                 onMouseLeave={(e) => {
                   if (activeChat !== chat.id) {
                     e.currentTarget.style.backgroundColor = "transparent";
                   }
-                  const menuBtn =
-                    e.currentTarget.querySelector("[data-menu-btn]");
-                  if (menuBtn && showChatMenu !== chat.id)
-                    menuBtn.style.opacity = "0";
+                  if (!isMobile) {
+                    e.currentTarget.querySelector(
+                      ".menu-button"
+                    ).style.opacity = "0";
+                  }
                 }}
               >
                 <div style={styles.chatInfo}>
@@ -231,7 +240,7 @@ const Sidebar = ({
                 </div>
                 <div style={styles.chatMenu}>
                   <button
-                    data-menu-btn
+                    className="menu-button"
                     style={{
                       ...styles.menuButton,
                       ...(isMobile ? styles.menuButtonMobile : {}),
@@ -242,8 +251,14 @@ const Sidebar = ({
                         showChatMenu === chat.id ? null : chat.id
                       );
                     }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#101a22")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.backgroundColor = "transparent")
+                    }
                   >
-                    <MoreVertical size={16} />
+                    <MoreVertical size={14} />
                   </button>
                   {showChatMenu === chat.id && (
                     <div
@@ -258,14 +273,16 @@ const Sidebar = ({
                           ...(isMobile ? styles.menuItemMobile : {}),
                         }}
                         onMouseEnter={(e) =>
-                          (e.currentTarget.style.backgroundColor =
-                            "rgba(255, 255, 255, 0.1)")
+                          (e.currentTarget.style.backgroundColor = "#101a22")
                         }
                         onMouseLeave={(e) =>
                           (e.currentTarget.style.backgroundColor =
                             "transparent")
                         }
-                        onClick={() => handleRenameChat(chat.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRenameChat(chat.id);
+                        }}
                       >
                         <Edit2 size={14} />
                         Rename
@@ -276,34 +293,16 @@ const Sidebar = ({
                           ...(isMobile ? styles.menuItemMobile : {}),
                         }}
                         onMouseEnter={(e) =>
-                          (e.currentTarget.style.backgroundColor =
-                            "rgba(255, 255, 255, 0.1)")
+                          (e.currentTarget.style.backgroundColor = "#101a22")
                         }
                         onMouseLeave={(e) =>
                           (e.currentTarget.style.backgroundColor =
                             "transparent")
                         }
-                        onClick={() => {
-                          setShowChatMenu(null);
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteChat(chat.id);
                         }}
-                      >
-                        <Pin size={14} />
-                        Pin Chat
-                      </div>
-                      <div
-                        style={{
-                          ...styles.menuItem,
-                          ...(isMobile ? styles.menuItemMobile : {}),
-                        }}
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.backgroundColor =
-                            "rgba(239, 68, 68, 0.1)")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.backgroundColor =
-                            "transparent")
-                        }
-                        onClick={() => handleDeleteChat(chat.id)}
                       >
                         <Trash2 size={14} />
                         Delete
@@ -316,20 +315,43 @@ const Sidebar = ({
         )}
       </div>
 
-      <div
-        style={{
-          padding: isMobile ? "16px 12px" : "12px 16px",
-          fontSize: isMobile ? "12px" : "11px",
-          color: "#6b7280",
-          textAlign: "center",
-          borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-        }}
-      >
-        <div style={{ marginBottom: "4px" }}>
-          AI Responses May Contain Inaccuracies.
-        </div>
-        <div>Verify Important Information</div>
-      </div>
+      {/* Mobile Settings Button - Fixed at bottom right */}
+      {isMobile && (
+        <button
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            zIndex: 1003,
+            width: "56px",
+            height: "56px",
+            borderRadius: "50%",
+            backgroundColor: "#f59e0b",
+            border: "none",
+            color: "#0f172a",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(245, 158, 11, 0.4)",
+            transition: "all 0.2s",
+          }}
+          onClick={() => {
+            setShowSettings(!showSettings);
+            setShowMobileSidebar(false);
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#dc9a08";
+            e.currentTarget.style.transform = "scale(1.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#f59e0b";
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+        >
+          <Settings size={24} />
+        </button>
+      )}
     </div>
   );
 };

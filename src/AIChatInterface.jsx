@@ -514,7 +514,7 @@ const AIChatInterface = () => {
       }}
     >
       {/* Mobile Menu Button */}
-      {isMobile && (
+      {isMobile && !showMobileSidebar && (
         <div
           style={{
             position: "fixed",
