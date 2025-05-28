@@ -585,18 +585,6 @@ const AIChatInterface = () => {
               ...(isMobile ? styles.chatHeaderInfoMobile : {}),
             }}
           >
-            {isMobile && (
-              <button
-                onClick={() => setShowMobileSidebar(true)}
-                style={{
-                  ...styles.mobileMenuButton,
-                  ...styles.mobileMenuButtonVisible,
-                  marginRight: "8px",
-                }}
-              >
-                <Menu size={20} />
-              </button>
-            )}
             <MessageSquare size={20} color="#f0b86c" />
             {editingTitle ? (
               <input
@@ -1403,6 +1391,7 @@ const AIChatInterface = () => {
           ref={settingsRef}
           style={{
             ...styles.settingsPanel,
+            ...(isMobile ? styles.settingsPanelMobile : {}),
             transform: "translateX(0)",
           }}
         >
