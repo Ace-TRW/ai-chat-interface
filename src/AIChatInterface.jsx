@@ -503,7 +503,7 @@ const AIChatInterface = () => {
           </div>
           <div style={styles.modelSelector}>
             <Sparkles size={14} />
-            <span style={{ fontSize: "13px" }}>Powered by GPT-4</span>
+            <span style={{ fontSize: "13px" }}>Model: GPT 4o</span>
           </div>
         </div>
 
