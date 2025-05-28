@@ -743,21 +743,26 @@ export const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+    minHeight: "60px",
+    boxSizing: "border-box",
   },
   settingsHeaderMobile: {
     padding: "12px 16px",
+    minHeight: "60px",
   },
   settingsTitle: {
-    fontSize: "18px",
+    fontSize: "16px",
     fontWeight: "600",
     margin: 0,
     background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     backgroundClip: "text",
+    lineHeight: "1.2",
   },
   settingsTitleMobile: {
-    fontSize: "16px",
+    fontSize: "15px",
+    lineHeight: "1.2",
   },
   closeButton: {
     padding: "6px",
