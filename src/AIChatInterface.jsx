@@ -69,7 +69,7 @@ const AIChatInterface = () => {
   const [messageAllowance, setMessageAllowance] = useState({
     freeUsed: 0,
     freeTotal: 30,
-    purchasedAvailable: 0,
+    purchasedAvailable: 0, // Back to 0 - users start with no purchased messages
   });
   const [walletBalance, setWalletBalance] = useState(0.0);
   const [autoRefillMessages, setAutoRefillMessages] = useState({
@@ -240,6 +240,9 @@ const AIChatInterface = () => {
   // Handle clicking outside settings panel to close it
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Don't close settings if purchase modal is open
+      if (showPurchaseModal) return;
+
       if (settingsRef.current && !settingsRef.current.contains(event.target)) {
         setShowSettings(false);
       }
@@ -252,7 +255,7 @@ const AIChatInterface = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showSettings]);
+  }, [showSettings, showPurchaseModal]); // Add showPurchaseModal to dependencies
 
   const handleSendMessage = () => {
     if (!messageInput.trim() || totalMessagesAvailable <= 0) return;
@@ -1150,9 +1153,10 @@ const AIChatInterface = () => {
             </button>
           </div>
 
-          <div style={styles.settingsSection}>
-            <h3 style={styles.sectionTitle}>AI Assistant Usage</h3>
-            {messageAllowance.purchasedAvailable > 0 ? (
+          {/* Only show AI Assistant Usage section if user has purchased messages */}
+          {messageAllowance.purchasedAvailable > 0 && (
+            <div style={styles.settingsSection}>
+              <h3 style={styles.sectionTitle}>AI Assistant Usage</h3>
               <div style={styles.settingsItem}>
                 <div style={styles.settingsLabel}>Messages Remaining</div>
                 <div style={styles.usageBar}>
@@ -1170,52 +1174,18 @@ const AIChatInterface = () => {
                   />
                 </div>
               </div>
-            ) : (
-              <div style={styles.settingsItem}>
-                <div style={styles.settingsLabel}>Free Messages</div>
-                <div style={styles.usageBar}>
-                  <div style={styles.settingsValue}>
-                    {messageAllowance.freeTotal - messageAllowance.freeUsed} of{" "}
-                    {messageAllowance.freeTotal} free messages remaining
-                  </div>
-                </div>
-                <div style={styles.tokenBar}>
-                  <div
-                    style={{
-                      ...styles.tokenProgress,
-                      width: `${
-                        ((messageAllowance.freeTotal -
-                          messageAllowance.freeUsed) /
-                          messageAllowance.freeTotal) *
-                        100
-                      }%`,
-                      backgroundColor:
-                        messageAllowance.freeUsed / messageAllowance.freeTotal >
-                        0.8
-                          ? "#ef4444"
-                          : "#f0b86c",
-                    }}
-                  />
-                </div>
-                {totalMessagesAvailable === 0 && (
-                  <div style={styles.resetTimer}>
-                    <span style={{ fontSize: "12px", color: "#6b7280" }}>
-                      Free messages reset in {resetTimer.hours}h{" "}
-                      {resetTimer.minutes}m {resetTimer.seconds}s
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
-            <button
-              style={styles.topUpButton}
-              onClick={() => {
-                messagePacksRef.current?.scrollIntoView({ behavior: "smooth" });
-              }}
-            >
-              Get More Messages
-            </button>
-          </div>
+              <button
+                style={styles.topUpButton}
+                onClick={() => {
+                  messagePacksRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                  });
+                }}
+              >
+                Get More Messages
+              </button>
+            </div>
+          )}
 
           <div style={styles.settingsSection}>
             <h3 style={styles.sectionTitle}>Payment & Billing</h3>
