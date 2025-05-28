@@ -668,11 +668,26 @@ const AIChatInterface = () => {
                 padding: isMobile ? "20px" : "0",
               }}
             >
-              <Bot
-                size={isMobile ? 40 : 48}
-                color="#f0b86c"
-                style={{ opacity: 0.5 }}
-              />
+              <div
+                style={{
+                  background:
+                    "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Bot
+                  size={isMobile ? 40 : 48}
+                  style={{
+                    opacity: 0.8,
+                    filter: "drop-shadow(0 0 20px rgba(245, 158, 11, 0.3))",
+                  }}
+                />
+              </div>
               <h3
                 style={{
                   color: "#a0aec0",
