@@ -78,7 +78,7 @@ const AIChatInterface = () => {
     packToPurchase: MESSAGE_PACK_OPTIONS[0], // Default to first option
   });
   const [resetTimer, setResetTimer] = useState({
-    hours: 23,
+    hours: 2,
     minutes: 45,
     seconds: 30,
   });
@@ -128,7 +128,7 @@ const AIChatInterface = () => {
             ...prev,
             freeUsed: 0,
           }));
-          return { hours: 23, minutes: 59, seconds: 59 };
+          return { hours: 2, minutes: 59, seconds: 59 };
         }
       });
     }, 1000);
@@ -964,7 +964,9 @@ const AIChatInterface = () => {
                   <div style={styles.tokenWarning}>
                     <AlertCircle size={16} />
                     <span>
-                      You're out of messages.{" "}
+                      You're out of messages. Free messages reset in{" "}
+                      {resetTimer.hours}h {resetTimer.minutes}m{" "}
+                      {resetTimer.seconds}s.{" "}
                       <a
                         href="#"
                         onClick={(e) => {
@@ -979,7 +981,7 @@ const AIChatInterface = () => {
                       >
                         Purchase more messages
                       </a>{" "}
-                      to continue chatting.
+                      to continue chatting now.
                     </span>
                   </div>
                 )}
@@ -1198,12 +1200,14 @@ const AIChatInterface = () => {
                   }}
                 />
               </div>
-              <div style={styles.resetTimer}>
-                <span style={{ fontSize: "12px", color: "#6b7280" }}>
-                  Free messages reset in {resetTimer.hours}h{" "}
-                  {resetTimer.minutes}m {resetTimer.seconds}s
-                </span>
-              </div>
+              {totalMessagesAvailable === 0 && (
+                <div style={styles.resetTimer}>
+                  <span style={{ fontSize: "12px", color: "#6b7280" }}>
+                    Free messages reset in {resetTimer.hours}h{" "}
+                    {resetTimer.minutes}m {resetTimer.seconds}s
+                  </span>
+                </div>
+              )}
             </div>
             <button
               style={styles.topUpButton}
