@@ -1448,8 +1448,18 @@ const AIChatInterface = () => {
           <div style={styles.settingsSection}>
             <h3 style={styles.sectionTitle}>Payment & Billing</h3>
             {platformCardInfo ? (
-              <div style={styles.cardItem}>
-                <div style={styles.cardInfo}>
+              <div
+                style={{
+                  ...styles.cardItem,
+                  ...(isMobile ? styles.cardItemMobile : {}),
+                }}
+              >
+                <div
+                  style={{
+                    ...styles.cardInfo,
+                    ...(isMobile ? styles.cardInfoMobile : {}),
+                  }}
+                >
                   <CreditCard size={20} />
                   <div>
                     <div style={{ fontSize: "14px" }}>
@@ -1506,19 +1516,41 @@ const AIChatInterface = () => {
 
           <div style={styles.settingsSection}>
             <h3 style={styles.sectionTitle}>Wallet</h3>
-            <div style={styles.walletCard}>
+            <div
+              style={{
+                ...styles.walletCard,
+                ...(isMobile ? styles.walletCardMobile : {}),
+              }}
+            >
               <div style={styles.settingsLabel}>Current Balance</div>
-              <div style={styles.walletBalance}>
+              <div
+                style={{
+                  ...styles.walletBalance,
+                  ...(isMobile ? styles.walletBalanceMobile : {}),
+                }}
+              >
                 ${walletBalance.toFixed(2)} USD
               </div>
-              <button style={styles.topUpButton}>
+              <button
+                style={{
+                  ...styles.topUpButton,
+                  ...(isMobile ? styles.topUpButtonMobile : {}),
+                }}
+              >
                 <Wallet size={16} style={{ marginRight: "6px" }} />
                 Top Up Wallet
               </button>
             </div>
 
             <div style={styles.settingsItem}>
-              <h4 style={{ fontSize: "14px", marginBottom: "12px" }}>
+              <h4
+                style={{
+                  fontSize: "14px",
+                  marginBottom: "12px",
+                  color: "#ffffff",
+                  fontWeight: "600",
+                }}
+              >
                 Automatic Message Refill
               </h4>
               <div
@@ -1536,6 +1568,7 @@ const AIChatInterface = () => {
                 <div
                   style={{
                     ...styles.toggleSwitch,
+                    ...(isMobile ? styles.toggleSwitchMobile : {}),
                     ...(autoRefillMessages.enabled ? styles.toggleActive : {}),
                   }}
                   onClick={() =>
@@ -1548,6 +1581,7 @@ const AIChatInterface = () => {
                   <div
                     style={{
                       ...styles.toggleSlider,
+                      ...(isMobile ? styles.toggleSliderMobile : {}),
                       transform: autoRefillMessages.enabled
                         ? "translateX(20px)"
                         : "translateX(0)",
@@ -1659,7 +1693,13 @@ const AIChatInterface = () => {
               style={{ display: "flex", flexDirection: "column", gap: "8px" }}
             >
               {MESSAGE_PACK_OPTIONS.map((pack) => (
-                <div key={pack.packName} style={styles.cardItem}>
+                <div
+                  key={pack.packName}
+                  style={{
+                    ...styles.cardItem,
+                    ...(isMobile ? styles.cardItemMobile : {}),
+                  }}
+                >
                   <div>
                     <div style={{ fontSize: "14px", fontWeight: "600" }}>
                       {pack.packName}
@@ -1670,7 +1710,10 @@ const AIChatInterface = () => {
                   </div>
                   <button
                     onClick={() => handleBuyPack(pack)}
-                    style={styles.buyButton}
+                    style={{
+                      ...styles.buyButton,
+                      ...(isMobile ? styles.buyButtonMobile : {}),
+                    }}
                     disabled={!platformCardInfo && walletBalance < pack.price}
                   >
                     Buy
@@ -1686,7 +1729,13 @@ const AIChatInterface = () => {
             <div style={{ maxHeight: "200px", overflowY: "auto" }}>
               {transactionHistory.length > 0 ? (
                 transactionHistory.map((item) => (
-                  <div key={item.id} style={styles.transactionItem}>
+                  <div
+                    key={item.id}
+                    style={{
+                      ...styles.transactionItem,
+                      ...(isMobile ? styles.transactionItemMobile : {}),
+                    }}
+                  >
                     <div>
                       <div style={{ fontSize: "14px" }}>{item.description}</div>
                       <div style={{ fontSize: "12px", color: "#6b7280" }}>
