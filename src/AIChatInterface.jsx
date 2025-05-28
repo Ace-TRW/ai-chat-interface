@@ -216,11 +216,11 @@ const AIChatInterface = () => {
     }
   }, [messages, activeChat]);
 
-  // Calculate total messages available
+  // Calculate total messages available - only show purchased messages unless they're out
   const totalMessagesAvailable =
-    messageAllowance.freeTotal -
-    messageAllowance.freeUsed +
-    messageAllowance.purchasedAvailable;
+    messageAllowance.purchasedAvailable > 0
+      ? messageAllowance.purchasedAvailable
+      : messageAllowance.freeTotal - messageAllowance.freeUsed;
 
   // Auto-scroll functionality - simplified and more common approach
   useEffect(() => {
@@ -307,12 +307,12 @@ const AIChatInterface = () => {
     setIsTyping(true);
     setIsGenerating(true);
 
-    // Update message allowance (consume free messages first, then purchased)
+    // Update message allowance (consume purchased messages first, then free)
     setMessageAllowance((prev) => {
-      if (prev.freeUsed < prev.freeTotal) {
-        return { ...prev, freeUsed: prev.freeUsed + 1 };
-      } else {
+      if (prev.purchasedAvailable > 0) {
         return { ...prev, purchasedAvailable: prev.purchasedAvailable - 1 };
+      } else {
+        return { ...prev, freeUsed: prev.freeUsed + 1 };
       }
     });
 
@@ -930,11 +930,6 @@ const AIChatInterface = () => {
 
         <div style={styles.inputContainer}>
           {(() => {
-            const freeMessagesRemaining =
-              messageAllowance.freeTotal - messageAllowance.freeUsed;
-            const totalMessagesAvailable =
-              freeMessagesRemaining + messageAllowance.purchasedAvailable;
-
             return (
               <>
                 {totalMessagesAvailable <= 10 && totalMessagesAvailable > 0 && (
@@ -1157,58 +1152,61 @@ const AIChatInterface = () => {
 
           <div style={styles.settingsSection}>
             <h3 style={styles.sectionTitle}>AI Assistant Usage</h3>
-            <div style={styles.settingsItem}>
-              <div style={styles.settingsLabel}>Messages Remaining</div>
-              <div style={styles.usageBar}>
-                <div style={styles.settingsValue}>
-                  {(() => {
-                    const freeMessagesLeft =
-                      messageAllowance.freeTotal - messageAllowance.freeUsed;
-                    const totalMessages =
-                      freeMessagesLeft + messageAllowance.purchasedAvailable;
-                    return `${totalMessages} Messages Available`;
-                  })()}
+            {messageAllowance.purchasedAvailable > 0 ? (
+              <div style={styles.settingsItem}>
+                <div style={styles.settingsLabel}>Messages Remaining</div>
+                <div style={styles.usageBar}>
+                  <div style={styles.settingsValue}>
+                    {messageAllowance.purchasedAvailable} Messages Available
+                  </div>
                 </div>
-                {messageAllowance.purchasedAvailable > 0 && (
+                <div style={styles.tokenBar}>
                   <div
                     style={{
-                      fontSize: "12px",
-                      color: "#6b7280",
-                      marginTop: "4px",
+                      ...styles.tokenProgress,
+                      width: "100%", // Show full bar for purchased messages
+                      backgroundColor: "#f0b86c",
                     }}
-                  >
-                    ({messageAllowance.freeTotal - messageAllowance.freeUsed}{" "}
-                    free + {messageAllowance.purchasedAvailable} purchased)
+                  />
+                </div>
+              </div>
+            ) : (
+              <div style={styles.settingsItem}>
+                <div style={styles.settingsLabel}>Free Messages</div>
+                <div style={styles.usageBar}>
+                  <div style={styles.settingsValue}>
+                    {messageAllowance.freeTotal - messageAllowance.freeUsed} of{" "}
+                    {messageAllowance.freeTotal} free messages remaining
+                  </div>
+                </div>
+                <div style={styles.tokenBar}>
+                  <div
+                    style={{
+                      ...styles.tokenProgress,
+                      width: `${
+                        ((messageAllowance.freeTotal -
+                          messageAllowance.freeUsed) /
+                          messageAllowance.freeTotal) *
+                        100
+                      }%`,
+                      backgroundColor:
+                        messageAllowance.freeUsed / messageAllowance.freeTotal >
+                        0.8
+                          ? "#ef4444"
+                          : "#f0b86c",
+                    }}
+                  />
+                </div>
+                {totalMessagesAvailable === 0 && (
+                  <div style={styles.resetTimer}>
+                    <span style={{ fontSize: "12px", color: "#6b7280" }}>
+                      Free messages reset in {resetTimer.hours}h{" "}
+                      {resetTimer.minutes}m {resetTimer.seconds}s
+                    </span>
                   </div>
                 )}
               </div>
-              <div style={styles.tokenBar}>
-                <div
-                  style={{
-                    ...styles.tokenProgress,
-                    width: `${
-                      ((messageAllowance.freeTotal -
-                        messageAllowance.freeUsed) /
-                        messageAllowance.freeTotal) *
-                      100
-                    }%`,
-                    backgroundColor:
-                      messageAllowance.freeUsed / messageAllowance.freeTotal >
-                      0.8
-                        ? "#ef4444"
-                        : "#f0b86c",
-                  }}
-                />
-              </div>
-              {totalMessagesAvailable === 0 && (
-                <div style={styles.resetTimer}>
-                  <span style={{ fontSize: "12px", color: "#6b7280" }}>
-                    Free messages reset in {resetTimer.hours}h{" "}
-                    {resetTimer.minutes}m {resetTimer.seconds}s
-                  </span>
-                </div>
-              )}
-            </div>
+            )}
             <button
               style={styles.topUpButton}
               onClick={() => {
@@ -1247,10 +1245,34 @@ const AIChatInterface = () => {
                 </button>
               </div>
             ) : (
-              <p style={{ fontSize: "14px", color: "#6b7280" }}>
-                No primary card on file. Please set one in your platform
-                settings.
-              </p>
+              <>
+                <p
+                  style={{
+                    fontSize: "14px",
+                    color: "#6b7280",
+                    marginBottom: "8px",
+                  }}
+                >
+                  To purchase message packs or enable automatic refill, please
+                  add a payment card to your platform account.
+                </p>
+                <button
+                  onClick={() =>
+                    alert("TODO: Link to main platform page to add a card")
+                  }
+                  style={{
+                    ...styles.topUpButton,
+                    width: "100%",
+                    marginBottom: "8px",
+                  }}
+                >
+                  + Add Payment Card
+                </button>
+                <p style={{ fontSize: "12px", color: "#6b7280" }}>
+                  Alternatively, you can top up your wallet with crypto and
+                  purchase message packs using your wallet balance.
+                </p>
+              </>
             )}
           </div>
 
