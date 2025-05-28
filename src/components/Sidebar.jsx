@@ -21,6 +21,7 @@ const Sidebar = ({
   showChatMenu,
   setShowChatMenu,
   setShowSettings,
+  showSettings,
   handleDeleteChat,
   handleRenameChat,
 }) => {
@@ -34,7 +35,7 @@ const Sidebar = ({
           </div>
           <button
             style={styles.settingsButton}
-            onClick={() => setShowSettings(true)}
+            onClick={() => setShowSettings(!showSettings)}
             onMouseEnter={(e) =>
               (e.currentTarget.style.backgroundColor = "#101a22")
             }

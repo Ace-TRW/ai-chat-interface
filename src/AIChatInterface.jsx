@@ -88,6 +88,7 @@ const AIChatInterface = () => {
   // Refs for auto-scroll
   const chatAreaRef = useRef(null);
   const messagePacksRef = useRef(null);
+  const settingsRef = useRef(null);
 
   // Sample chat data - Start empty for new user experience
   const [chats, setChats] = useState([]);
@@ -235,6 +236,23 @@ const AIChatInterface = () => {
       }
     }
   }, [messages, isTyping]); // Trigger on new messages or when AI stops typing
+
+  // Handle clicking outside settings panel to close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
+        setShowSettings(false);
+      }
+    };
+
+    if (showSettings) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showSettings]);
 
   const handleSendMessage = () => {
     if (!messageInput.trim() || totalMessagesAvailable <= 0) return;
@@ -438,6 +456,7 @@ const AIChatInterface = () => {
         showChatMenu={showChatMenu}
         setShowChatMenu={setShowChatMenu}
         setShowSettings={setShowSettings}
+        showSettings={showSettings}
         handleDeleteChat={handleDeleteChat}
         handleRenameChat={handleRenameChat}
       />
@@ -1112,6 +1131,7 @@ const AIChatInterface = () => {
       {/* Settings Panel */}
       {showSettings && (
         <div
+          ref={settingsRef}
           style={{
             ...styles.settingsPanel,
             transform: "translateX(0)",
