@@ -43,7 +43,7 @@ import Sidebar from "./components/Sidebar";
 // Message pack constants for consistency
 const MESSAGE_PACK_OPTIONS = [
   { packName: "100 Messages", price: 1.0, messages: 100, perMessage: 0.01 },
-  { packName: "250 Messages", price: 2.1, messages: 250, perMessage: 0.0084 },
+  { packName: "250 Messages", price: 2.0, messages: 250, perMessage: 0.008 },
   { packName: "1000 Messages", price: 7.5, messages: 1000, perMessage: 0.0075 },
   {
     packName: "5000 Messages",
@@ -1391,8 +1391,7 @@ const AIChatInterface = () => {
                       {pack.packName}
                     </div>
                     <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                      ${pack.price.toFixed(2)} (${pack.perMessage.toFixed(4)}{" "}
-                      per message)
+                      ${pack.price.toFixed(2)}
                     </div>
                   </div>
                   <button
